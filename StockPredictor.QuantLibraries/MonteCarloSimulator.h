@@ -12,13 +12,16 @@ namespace StockPredictor
 		{
 		public:
 			MonteCarloSimulator(void);
-			std::vector<double> SimulateStockPrice(int days, long iterations, double price, double drift, double volatility);
+			std::vector<double> SimulateStockPrice(int days, long iterations, double price, double rate, double dividendYield, double volatility);
+			std::vector<double> MonteCarloSimulator::SimulateStockPrice(int days, long iterations, double currentPrice, double volatility);
 			~MonteCarloSimulator(void);
 
 		private:
 			//std::vector<double> _arrPriceByDay;
 			/*void Initialize(int days);*/
 			bool Validate(int days, long iterations, double price, double drift, double volatility, std::string &message);
+			double GetDrift(double rate, double dividendYield);
+			double GetDailyRateFromYearlyRate(double rate);
 		};
 	}
 }

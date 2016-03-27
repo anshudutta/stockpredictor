@@ -62,15 +62,12 @@ namespace StockPredictorTests
 			double price = 10;
 			double drift = 0.01;
 			double stdDev = 0.25;
+			double rate = 0.65;
+			double divYield = 0.02;
 
-			std::vector<double> result = simulator.SimulateStockPrice(days, iterations, price, drift, stdDev);
+			std::vector<double> result = simulator.SimulateStockPrice(days, iterations, price, rate, divYield, stdDev);
 			double proceAtEndOfProjection = result[days-1];
 			Assert::AreNotEqual(0.0, proceAtEndOfProjection);
-			/*for (int i = 0; i < days; i++)
-			{
-				Logger::WriteMessage("Day " + i);
-				Logger::WriteMessage((str*)result[i]);
-			}*/
 		}
 	private :
 		double round(double number)

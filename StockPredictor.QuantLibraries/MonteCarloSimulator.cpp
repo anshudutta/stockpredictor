@@ -11,18 +11,7 @@ using namespace std;
 
 MonteCarloSimulator::MonteCarloSimulator(void)
 {
-	/*
-	_arrPriceByDay = NULL;*/
 }
-
-//void MonteCarloSimulator::Initialize(int days)
-//{
-//	/*if (_arrPriceByDay != NULL)
-//	{
-//		delete[] _arrPriceByDay;
-//	}*/
-//	//_arrPriceByDay = new double[days];
-//}
 
 bool MonteCarloSimulator::Validate(int days, long iterations, double currentPrice, double drift, double volatility, std::string &message) //pass by reference message
 {
@@ -61,13 +50,19 @@ bool MonteCarloSimulator::Validate(int days, long iterations, double currentPric
 	return valid;
 }
 
-vector<double> MonteCarloSimulator::SimulateStockPrice(int days, long iterations, double currentPrice, double drift, double volatility)
+vector<double> MonteCarloSimulator::SimulateStockPrice(int days, long iterations, double currentPrice, double volatility)
+{
+	return SimulateStockPrice(days, iterations, currentPrice, 0, 0, volatility);
+}
+
+vector<double> MonteCarloSimulator::SimulateStockPrice(int days, long iterations, double currentPrice, double rate, double dividendYield, double volatility)
 {
 	// The stock price is modelled by GBM St = S0 * e^(d+z*sigma)
 	// The log-normal return thus varies with a mean  = (drift - sigma^2 /2) * T and std deviation = sigma* sqroot(T)
 	// So d = (drift - sigma^  2 /2)
 
 	string validationMessage;
+	double drift = GetDrift(rate, dividendYield);
 	if (Validate(days, iterations, currentPrice, drift, volatility, validationMessage) == false)
 	{
 		throw validationMessage;
@@ -125,6 +120,16 @@ vector<double> MonteCarloSimulator::SimulateStockPrice(int days, long iterations
 	
 	delete[] arrPaths;
 	return _arrPriceByDay;
+}
+
+double MonteCarloSimulator::GetDrift(double rate, double dividendYield)
+{
+	return (rate - dividendYield) > 0 ? (rate - dividendYield) : 0;;
+}
+
+double MonteCarloSimulator::GetDailyRateFromYearlyRate(double rate)
+{
+	return pow((1+rate), 1/365) - 1;
 }
 
 MonteCarloSimulator::~MonteCarloSimulator(void)

@@ -59,7 +59,6 @@ namespace StockPredictor.Cs.Tests
         [Test]
         [TestCase("MSFT")]
         public void Data_Service_Returns_Valid_Options(
-            //[Values("MSFT")]
             string symbol)
         {
             var ds = new DataService();
@@ -88,6 +87,7 @@ namespace StockPredictor.Cs.Tests
             var yc = ds.GetYieldCurve();
             Assert.IsTrue(yc.Count > 0);
             Assert.IsTrue(yc[term] > 0);
+            Debug.WriteLine("{0} {1}", term, yc[term]);
         }
     }
 }
