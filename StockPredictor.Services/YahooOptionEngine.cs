@@ -1,15 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using HtmlAgilityPack;
+using StockPredictor.Model;
 
 namespace StockPredictor.Services
 {
     partial class YahooEngine
     {
-        public Dictionary<double, double> GetOptionData(string symbol)
+        public IEnumerable<Option> GetOptionData(string symbol)
         {
             const string url = "https://finance.yahoo.com/";
             var urlParameters = string.Format("q/op?s={0}+Option", symbol);
@@ -23,9 +25,10 @@ namespace StockPredictor.Services
             return Parse(dom);
         }
 
-        private static Dictionary<double, double> Parse(string dom)
+        private static IEnumerable<Option> Parse(string dom)
         {
-            var volSmile = new Dictionary<double, double>();
+            //var volSmile = new Dictionary<double, double>();
+            var optionList = new List<Option>();
             var source = WebUtility.HtmlDecode(dom);
             var resultat = new HtmlDocument();
             resultat.LoadHtml(source);
@@ -37,18 +40,37 @@ namespace StockPredictor.Services
             {
                 double strike;
                 double vol;
+                double bid;
+                double ask;
+
                 var tds = tr.ChildNodes.Where(d => d.Name == "td");
                 var htmlNodes = tds as HtmlNode[] ?? tds.ToArray();
                 var strikeHtml = htmlNodes[0].Descendants().First(x => x.Name == "a").InnerHtml;
                 var volHtml = htmlNodes[9].Descendants().First(x => x.Name == "div").InnerHtml.Replace("%", string.Empty);
-                if (double.TryParse(strikeHtml, out strike) && double.TryParse(volHtml, out vol) && vol > 0)
+                var contractName = htmlNodes[1].Descendants().First(x => x.Name == "a").InnerHtml;
+                var bidHtml = htmlNodes[3].Descendants().First(x => x.Name == "div").InnerHtml;
+                var askHtml = htmlNodes[4].Descendants().First(x => x.Name == "div").InnerHtml;
+
+                if (double.TryParse(strikeHtml, out strike) 
+                    && double.TryParse(volHtml, out vol) 
+                    && double.TryParse(bidHtml, out bid)
+                    && double.TryParse(askHtml, out ask)
+                    && !string.IsNullOrEmpty(contractName))
                 {
-                    volSmile[strike] = vol;
+                    var option = new Option
+                    {
+                        Strike = strike,
+                        ImpliedVolatility = vol,
+                        Bid = bid,
+                        Ask = ask,
+                        ContractName = contractName
+                    };
+                    optionList.Add(option);
                 }
 
             }
 
-            return volSmile;
+            return optionList;
         }
     }
 }

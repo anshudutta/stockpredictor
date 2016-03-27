@@ -6,22 +6,23 @@ namespace StockPredictor.Services
 {
     public class DataService : IDataService
     {
-        public IEnumerable<Quote> GetStockQuote(List<string> quotes)
+        public IEnumerable<Stock> GetStockQuote(List<string> quotes)
         {
             var engine = new YahooEngine();
             return engine.Fetch(quotes);
         }
 
-        public Dictionary<double, double> GetVolatilitySmile(string symbol)
+        public IEnumerable<Option> GetOptionData(string symbol)
         {
             var engine = new YahooEngine();
             return engine.GetOptionData(symbol);
         }
 
-        public double GetImpliedVolatility(string symbol)
+        public double? GetImpliedVolatility(string symbol)
         {
-            var volSmile = GetVolatilitySmile(symbol);
-            return volSmile == null || volSmile.Count == 0 ? 0 : volSmile.Average(kv => kv.Value)/100;
+            var options = GetOptionData(symbol) ;
+            var enumerable = options as Option[] ?? options.ToArray();
+            return options == null || !enumerable.Any() ? (double?) null : enumerable.Average(o => o.ImpliedVolatility) / 100;
         }
 
         public Dictionary<string, double> GetYieldCurve()

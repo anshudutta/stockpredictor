@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace StockPredictor.Model
 {
-    public class Quote
+    public class Stock
     {
         public decimal? Ask { get; set; }
         public decimal? Bid { get; set; }

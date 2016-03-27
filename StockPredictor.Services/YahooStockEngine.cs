@@ -12,7 +12,7 @@ namespace StockPredictor.Services
                                         "select%20*%20from%20yahoo.finance.quotes%20where%20symbol%20in%20({0})" +
                                         "&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys";
 
-        public IEnumerable<Quote> Fetch(IEnumerable<string> symbols)
+        public IEnumerable<Stock> Fetch(IEnumerable<string> symbols)
         {
             var enumerable = symbols.ToArray();
             var symbolList = String.Join("%2C", enumerable.Select(w => "%22" + w + "%22").ToArray());
@@ -22,15 +22,15 @@ namespace StockPredictor.Services
             return Parse(enumerable,doc);
         }
  
-        private static IEnumerable<Quote> Parse(IEnumerable<string> symbols, XDocument doc)
+        private static IEnumerable<Stock> Parse(IEnumerable<string> symbols, XDocument doc)
         {
             if (doc.Root == null) return null;
             var results = doc.Root.Element("results");
-            var quotes = new List<Quote>();
+            var quotes = new List<Stock>();
  
             foreach (var symbol in symbols)
             {
-                var quote = new Quote {Symbol = symbol};
+                var quote = new Stock {Symbol = symbol};
                 var q = results.Elements("quote").First(w => w.Attribute("symbol").Value == quote.Symbol);
  
                 quote.Ask = GetDecimal(q.Element("Ask").Value);

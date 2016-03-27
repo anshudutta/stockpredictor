@@ -16,26 +16,34 @@ namespace StockPredictor.Cs.Tests
         public void Teardown(){}
 
         [Test]
-        public void Data_Service_Returns_Volatility()
+        [TestCase("MSFT")]
+        [TestCase("GOOG")]
+        public void Data_Service_Returns_Volatility(
+            string symbol)
         {
             var ds = new DataService();
-            double impliedVol = ds.GetImpliedVolatility("MSFT");
+            var impliedVol = ds.GetImpliedVolatility(symbol);
             Assert.IsTrue(impliedVol > 0);
             Debug.WriteLine(impliedVol);
-            impliedVol = ds.GetImpliedVolatility("GOOG");
-            Assert.IsTrue(impliedVol > 0);
-            Debug.WriteLine(impliedVol);
-            Assert.IsTrue(ds.GetImpliedVolatility("CAB.AX") == 0.0);
         }
 
         [Test]
-        public void Data_Service_Returns_Valid_Quote()
+        [TestCase("CAB.AX")]
+        public void Data_Service_Returns_Null_For_NA_Symbol(
+            string symbol)
         {
             var ds = new DataService();
-            var symbols = new List<string>()
-            {
-                "MSFT"
-            };
+            var impliedVol = ds.GetImpliedVolatility(symbol);
+            Assert.IsNull(impliedVol);
+        }
+
+        [Test]
+        [TestCase("MSFT")]
+        public void Data_Service_Returns_Valid_Quote(
+            string symbol)
+        {
+            var ds = new DataService();
+            var symbols = new List<string>{symbol};
 
             var quote = ds.GetStockQuote(symbols).First();
             Assert.IsTrue(quote.Bid > 0);
@@ -49,12 +57,37 @@ namespace StockPredictor.Cs.Tests
         }
 
         [Test]
-        public void Data_Service_Returns_Yield_Curve()
+        [TestCase("MSFT")]
+        public void Data_Service_Returns_Valid_Options(
+            //[Values("MSFT")]
+            string symbol)
+        {
+            var ds = new DataService();
+            var symbols = new List<string> { symbol };
+
+            var quote = ds.GetStockQuote(symbols).First();
+            Assert.IsTrue(quote.Bid > 0);
+            Assert.IsTrue(quote.Ask > 0);
+            Assert.IsTrue(quote.DividendYield > 0);
+
+            Debug.WriteLine(quote.Symbol);
+            Debug.WriteLine(quote.Bid);
+            Debug.WriteLine(quote.Ask);
+            Debug.WriteLine(quote.DividendYield);
+        }
+
+        [Test]
+        [TestCase("1 MO")]
+        [TestCase("3 MO")]
+        [TestCase("6 MO")]
+        [TestCase("1 YR")]
+        [TestCase("2 YR")]
+        public void Data_Service_Returns_Yield_Curve(string term)
         {
             var ds = new DataService();
             var yc = ds.GetYieldCurve();
             Assert.IsTrue(yc.Count > 0);
-            Assert.IsTrue(yc["1 YR"] > 0);
+            Assert.IsTrue(yc[term] > 0);
         }
     }
 }
