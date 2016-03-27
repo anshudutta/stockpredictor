@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StockPredictor.Model", "Sto
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StockPredictor.Cs.Tests", "StockPredictor.Cs.Tests\StockPredictor.Cs.Tests.csproj", "{2C1501A3-0A38-4F8F-BEAD-B49261FD1110}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StockProjector.Console", "StockProjector.Console\StockProjector.Console.csproj", "{EFE03F5E-B3FF-47A0-BFAB-E819633F8483}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -71,6 +73,16 @@ Global
 		{2C1501A3-0A38-4F8F-BEAD-B49261FD1110}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{2C1501A3-0A38-4F8F-BEAD-B49261FD1110}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{2C1501A3-0A38-4F8F-BEAD-B49261FD1110}.Release|Win32.ActiveCfg = Release|Any CPU
+		{EFE03F5E-B3FF-47A0-BFAB-E819633F8483}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EFE03F5E-B3FF-47A0-BFAB-E819633F8483}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EFE03F5E-B3FF-47A0-BFAB-E819633F8483}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{EFE03F5E-B3FF-47A0-BFAB-E819633F8483}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{EFE03F5E-B3FF-47A0-BFAB-E819633F8483}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{EFE03F5E-B3FF-47A0-BFAB-E819633F8483}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EFE03F5E-B3FF-47A0-BFAB-E819633F8483}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EFE03F5E-B3FF-47A0-BFAB-E819633F8483}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{EFE03F5E-B3FF-47A0-BFAB-E819633F8483}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{EFE03F5E-B3FF-47A0-BFAB-E819633F8483}.Release|Win32.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

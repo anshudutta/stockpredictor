@@ -17,8 +17,6 @@ namespace StockPredictor
 			~MonteCarloSimulator(void);
 
 		private:
-			//std::vector<double> _arrPriceByDay;
-			/*void Initialize(int days);*/
 			bool Validate(int days, long iterations, double price, double drift, double volatility, std::string &message);
 			double GetDrift(double rate, double dividendYield);
 			double GetDailyRateFromYearlyRate(double rate);

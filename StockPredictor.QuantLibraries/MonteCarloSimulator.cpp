@@ -124,7 +124,8 @@ vector<double> MonteCarloSimulator::SimulateStockPrice(int days, long iterations
 
 double MonteCarloSimulator::GetDrift(double rate, double dividendYield)
 {
-	return (rate - dividendYield) > 0 ? (rate - dividendYield) : 0;;
+	double drift = rate - dividendYield;
+	return drift > 0 ? drift : 0;;
 }
 
 double MonteCarloSimulator::GetDailyRateFromYearlyRate(double rate)
@@ -134,5 +135,4 @@ double MonteCarloSimulator::GetDailyRateFromYearlyRate(double rate)
 
 MonteCarloSimulator::~MonteCarloSimulator(void)
 {
-	//delete[] _arrPriceByDay;
 }
