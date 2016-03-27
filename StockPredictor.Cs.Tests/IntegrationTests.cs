@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using NUnit.Framework;
 using StockPredictor.Services;
 
@@ -16,7 +13,7 @@ namespace StockPredictor.Cs.Tests
         public void Setup(){}
 
         [TearDown]
-        public void Teardoen(){}
+        public void Teardown(){}
 
         [Test]
         public void Data_Service_Returns_Volatility()
@@ -49,6 +46,15 @@ namespace StockPredictor.Cs.Tests
             Debug.WriteLine(quote.Bid);
             Debug.WriteLine(quote.Ask);
             Debug.WriteLine(quote.DividendYield);
+        }
+
+        [Test]
+        public void Data_Service_Returns_Yield_Curve()
+        {
+            var ds = new DataService();
+            var yc = ds.GetYieldCurve();
+            Assert.IsTrue(yc.Count > 0);
+            Assert.IsTrue(yc["1 YR"] > 0);
         }
     }
 }

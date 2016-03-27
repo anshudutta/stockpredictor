@@ -2,15 +2,28 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
+using System.Net.Http;
 using HtmlAgilityPack;
 
 namespace StockPredictor.Services
 {
-    class OptionDomParser
+    partial class YahooEngine
     {
-        public static Dictionary<double, double> Parse(string dom)
+        public Dictionary<double, double> GetOptionData(string symbol)
+        {
+            const string url = "https://finance.yahoo.com/";
+            var urlParameters = string.Format("q/op?s={0}+Option", symbol);
+
+            var client = new HttpClient { BaseAddress = new Uri(url) };
+
+            var response = client.GetAsync(urlParameters).Result;
+            if (!response.IsSuccessStatusCode) return null;
+
+            var dom = response.Content.ReadAsStringAsync().Result;
+            return Parse(dom);
+        }
+
+        private static Dictionary<double, double> Parse(string dom)
         {
             var volSmile = new Dictionary<double, double>();
             var source = WebUtility.HtmlDecode(dom);

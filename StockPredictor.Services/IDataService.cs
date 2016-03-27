@@ -8,6 +8,6 @@ namespace StockPredictor.Services
         IEnumerable<Quote> GetStockQuote(List<string> quotes);
         Dictionary<double, double> GetVolatilitySmile(string symbol);
         double GetImpliedVolatility(string symbol);
-        double GetRiskFreeRate();
+        Dictionary<string, double> GetYieldCurve();
     }
 }
