@@ -12,6 +12,7 @@ namespace StockPredictor{
 		public:
 			QuantFunctions(void);
 			double GetInverseCDF(double p);
+			double GetDailyRateFromYearlyRate(double rate);
 			~QuantFunctions(void);
 		};
 	}

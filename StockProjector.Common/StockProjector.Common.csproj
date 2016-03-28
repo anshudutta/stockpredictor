@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{EFE03F5E-B3FF-47A0-BFAB-E819633F8483}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{2CC06B8F-5808-4354-A428-F2166B5D7713}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>StockProjector.Console</RootNamespace>
-    <AssemblyName>StockProjector.Console</AssemblyName>
+    <RootNamespace>StockProjector.Common</RootNamespace>
+    <AssemblyName>StockProjector.Common</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -31,6 +31,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -41,8 +44,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StockManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -52,11 +55,18 @@
       <Project>{d92b9b12-0b6b-4455-9384-a23a953daffc}</Project>
       <Name>StockPredictor.Model</Name>
     </ProjectReference>
+    <ProjectReference Include="..\StockPredictor.Services\StockPredictor.Services.csproj">
+      <Project>{f5cf185c-79bb-400a-b1f9-d8cd24946c8f}</Project>
+      <Name>StockPredictor.Services</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\StockProjector.ManagedWrapper\StockProjector.ManagedWrapper.vcxproj">
+      <Project>{d6c76d41-b927-408b-9e03-011df28d65dc}</Project>
+      <Name>StockProjector.ManagedWrapper</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>
-    </PreBuildEvent>
+    <PreBuildEvent>xcopy "$(SolutionDir)$(Configuration)\StockPredictor.QuantLibraries.dll"  "$(ProjectDir)bin\$(Configuration)" /Y/D</PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

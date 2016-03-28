@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
 using StockPredictor.Services;
+using StockProjector.Common;
 
 namespace StockPredictor.Cs.Tests
 {
@@ -88,6 +89,14 @@ namespace StockPredictor.Cs.Tests
             Assert.IsTrue(yc.Count > 0);
             Assert.IsTrue(yc[term] > 0);
             Debug.WriteLine("{0} {1}", term, yc[term]);
+        }
+
+        [Test]
+        [TestCase("MSFT",5)]
+        public void StockManager_Simulates_Stock_Prices(string symbol, int days)
+        {
+            var manager = new StockManager {DataService = new DataService()};
+            manager.GetStockProjections(symbol, days);
         }
     }
 }

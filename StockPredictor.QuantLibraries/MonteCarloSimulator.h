@@ -19,7 +19,6 @@ namespace StockPredictor
 		private:
 			bool Validate(int days, long iterations, double price, double drift, double volatility, std::string &message);
 			double GetDrift(double rate, double dividendYield);
-			double GetDailyRateFromYearlyRate(double rate);
 		};
 	}
 }

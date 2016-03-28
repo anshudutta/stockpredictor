@@ -27,7 +27,7 @@ namespace StockPredictor.Services
 
             for (int i = 1; i < columns.Count(); i++)
             {
-                yieldCurve[columns[i].Value<string>()] = dataSet[i].Value<double>();
+                yieldCurve[columns[i].Value<string>()] = dataSet[i].Value<double>()/100;
             }
             return yieldCurve;
         }

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using StockPredictor.Model;
+using System.Configuration;
 
 namespace StockPredictor.Services
 {
@@ -29,6 +30,12 @@ namespace StockPredictor.Services
         {
             var engine = new QuandlEngine();
             return engine.GetYieldCurve();
+        }
+
+        public string GetAppSettings(string key, string defaultValue)
+        {
+            var returnValue = ConfigurationManager.AppSettings[key];
+            return string.IsNullOrEmpty(returnValue) ? defaultValue : returnValue;
         }
     }
 }

@@ -84,6 +84,11 @@ double QuantFunctions::GetInverseCDF(double p)
 	return iCFDValue;
 }
 
+double QuantFunctions::GetDailyRateFromYearlyRate(double rate)
+{
+	return pow((1+rate), 1/365) - 1;
+}
+
 QuantFunctions::~QuantFunctions(void)
 {
 }

@@ -9,5 +9,6 @@ namespace StockPredictor.Services
         IEnumerable<Option> GetOptionData(string symbol);
         double? GetImpliedVolatility(string symbol);
         Dictionary<string, double> GetYieldCurve();
+        string GetAppSettings(string key, string defaultValue);
     }
 }
