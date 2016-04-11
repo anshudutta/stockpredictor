@@ -95,7 +95,7 @@ namespace StockPredictor.Cs.Tests
         public void StockManager_Simulates_Stock_Prices(string symbol, int days)
         {
             var manager = new StockManager {DataService = new DataService()};
-            manager.GetStockProjections(symbol, days);
+            var stockPrices = manager.GetStockProjections(symbol, days);
         }
     }
 }

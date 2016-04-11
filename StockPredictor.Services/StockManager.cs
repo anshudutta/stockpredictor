@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using StockPredictorManagedWrapper;
 
 namespace StockPredictor.Services
@@ -29,7 +28,7 @@ namespace StockPredictor.Services
             {
                 using (var quantLib = new NativeClassWrapper())
                 {
-                    return quantLib.SimulateStockPrice(days, iterations, price, rate1Year, dividendYield, impliedVolatility.Value).ToArray();
+                    //return quantLib.SimulateStockPrice(days, iterations, price, rate1Year, dividendYield, impliedVolatility.Value).ToArray();
                 }
 
             }
