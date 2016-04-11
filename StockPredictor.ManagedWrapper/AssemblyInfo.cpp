@@ -11,11 +11,11 @@ using namespace System::Security::Permissions;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 //
-[assembly:AssemblyTitleAttribute("StockProjectorManagedWrapper")];
+[assembly:AssemblyTitleAttribute("StockPredictorManagedWrapper")];
 [assembly:AssemblyDescriptionAttribute("")];
 [assembly:AssemblyConfigurationAttribute("")];
 [assembly:AssemblyCompanyAttribute("")];
-[assembly:AssemblyProductAttribute("StockProjectorManagedWrapper")];
+[assembly:AssemblyProductAttribute("StockPredictorManagedWrapper")];
 [assembly:AssemblyCopyrightAttribute("Copyright (c)  2016")];
 [assembly:AssemblyTrademarkAttribute("")];
 [assembly:AssemblyCultureAttribute("")];

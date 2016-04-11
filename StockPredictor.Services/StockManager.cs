@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using StockPredictor.Services;
-using System.Runtime.InteropServices;
-using StockProjectorManagedWrapper;
+using System.Text;
+using StockPredictorManagedWrapper;
 
-namespace StockProjector.Common
+namespace StockPredictor.Services
 {
-    public class StockManager// : IDisposable
+    public class StockManager
     {
         //private static readonly NativeClassWrapper QuantLib = new NativeClassWrapper();
         public IDataService DataService { get; set; }
@@ -30,9 +29,9 @@ namespace StockProjector.Common
             {
                 using (var quantLib = new NativeClassWrapper())
                 {
-                    return quantLib.SimulateStockPrice(days, iterations, price, rate1Year, dividendYield, impliedVolatility.Value);
+                    return quantLib.SimulateStockPrice(days, iterations, price, rate1Year, dividendYield, impliedVolatility.Value).ToArray();
                 }
-                
+
             }
             //else
             //{
@@ -50,5 +49,6 @@ namespace StockProjector.Common
         //{
         //    Marshal.ReleaseComObject(QuantLib);
         //}
+    
     }
 }

@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
 using StockPredictor.Services;
-using StockProjector.Common;
 
 namespace StockPredictor.Cs.Tests
 {

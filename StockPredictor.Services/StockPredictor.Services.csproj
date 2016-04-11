@@ -54,10 +54,15 @@
     <Compile Include="IDataService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QuandlEngine.cs" />
+    <Compile Include="StockManager.cs" />
     <Compile Include="YahooOptionEngine.cs" />
     <Compile Include="YahooStockEngine.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\StockPredictor.ManagedWrapper\StockPredictor.ManagedWrapper.vcxproj">
+      <Project>{2b8ba49c-16c6-4b58-8f1f-e6965cb23133}</Project>
+      <Name>StockPredictor.ManagedWrapper</Name>
+    </ProjectReference>
     <ProjectReference Include="..\StockPredictor.Model\StockPredictor.Model.csproj">
       <Project>{d92b9b12-0b6b-4455-9384-a23a953daffc}</Project>
       <Name>StockPredictor.Model</Name>
