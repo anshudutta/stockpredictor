@@ -17,6 +17,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "StockPredictor.ManagedWrapp
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{9633D1B9-5E03-43A5-9C29-1ADA0E0FC1A4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StockPredictor.Console", "StockPredictor.Console\StockPredictor.Console.csproj", "{BF38BDE1-000B-491D-B7E6-6CCF102B9EB0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -111,6 +113,18 @@ Global
 		{2B8BA49C-16C6-4B58-8F1F-E6965CB23133}.Release|Win32.Build.0 = Release|Win32
 		{2B8BA49C-16C6-4B58-8F1F-E6965CB23133}.Release|x86.ActiveCfg = Release|Win32
 		{2B8BA49C-16C6-4B58-8F1F-E6965CB23133}.Release|x86.Build.0 = Release|Win32
+		{BF38BDE1-000B-491D-B7E6-6CCF102B9EB0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF38BDE1-000B-491D-B7E6-6CCF102B9EB0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF38BDE1-000B-491D-B7E6-6CCF102B9EB0}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{BF38BDE1-000B-491D-B7E6-6CCF102B9EB0}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{BF38BDE1-000B-491D-B7E6-6CCF102B9EB0}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{BF38BDE1-000B-491D-B7E6-6CCF102B9EB0}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{BF38BDE1-000B-491D-B7E6-6CCF102B9EB0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF38BDE1-000B-491D-B7E6-6CCF102B9EB0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BF38BDE1-000B-491D-B7E6-6CCF102B9EB0}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{BF38BDE1-000B-491D-B7E6-6CCF102B9EB0}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{BF38BDE1-000B-491D-B7E6-6CCF102B9EB0}.Release|Win32.ActiveCfg = Release|Any CPU
+		{BF38BDE1-000B-491D-B7E6-6CCF102B9EB0}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

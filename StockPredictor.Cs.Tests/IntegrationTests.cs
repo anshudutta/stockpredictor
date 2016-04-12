@@ -98,5 +98,13 @@ namespace StockPredictor.Cs.Tests
             var stockPrices = manager.GetStockProjections(symbol, days);
             Assert.IsTrue(stockPrices.Any());
         }
+
+        [Test]
+        public void GetStockTickers()
+        {
+            var nasdaqStockEngine = new NasdaqStockEngine();
+            var tickers = nasdaqStockEngine.GetStockTickers();
+            Assert.IsTrue(tickers.Any());
+        }
     }
 }

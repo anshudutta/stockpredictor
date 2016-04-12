@@ -105,6 +105,7 @@ namespace StockPredictor.Services
             if (DateTime.TryParse(input, out value)) return value;
             return null;
         }
+
     }
 }
 
