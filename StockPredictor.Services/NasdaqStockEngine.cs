@@ -11,62 +11,88 @@ namespace StockPredictor.Services
     public class NasdaqStockEngine
     {
         private const string FtpSite = "ftp://ftp.nasdaqtrader.com/symboldirectory/";
+        private const string Nasdaq = "nasdaqlisted.txt";
+        private const string Others = "otherlisted.txt";
+        private static Dictionary<string, string> _stockTickers;
+
+        public NasdaqStockEngine()
+        {
+            _stockTickers = null;
+        }
 
         public Dictionary<string, string> GetStockTickers()
         {
-            var list = DownloadTickers("nasdaqlisted.txt").ProcessData();
-            var otherListed = DownloadTickers("otherlisted.txt").ProcessData();
+            if (_stockTickers != null) return _stockTickers;
 
-            foreach (var item in otherListed.Where(item => !list.ContainsKey(item.Key)))
+            _stockTickers = new Dictionary<string, string>();
+            ProcessFiles(Nasdaq);
+            ProcessFiles(Others);
+
+            if (File.Exists(GetFullFilePath(Nasdaq)))
             {
-                list.Add(item.Key, item.Value);
+                _stockTickers = File.ReadAllText(GetFullFilePath(Nasdaq)).ProcessData();
             }
-            return list;
+
+            if (!File.Exists(GetFullFilePath(Others))) return _stockTickers;
+            var otherListed = File.ReadAllText(GetFullFilePath(Nasdaq)).ProcessData();
+            foreach (var item in otherListed.Where(item => !_stockTickers.ContainsKey(item.Key)))
+            {
+                _stockTickers.Add(item.Key, item.Value);
+            }
+
+            return _stockTickers;
         }
 
-        private static string DownloadTickers(string fileName)
+        private static void ProcessFiles(string fileName)
         {
-            string data = null;
+            var fullPath = GetFullFilePath(fileName);
+            if (File.Exists(fullPath) && File.GetCreationTime(fullPath) > DateTime.Now.AddDays(-1)) return;
+            File.Delete(fullPath);
+            DownloadTickers(fileName);
+        }
+
+        public List<string> LookUpStock(string search)
+        {
+            if (_stockTickers == null)
+            {
+                GetStockTickers();
+            }
+
+            List<string> returnValue = null;
+            if (_stockTickers == null) return null;
+            var matches = _stockTickers.Where(s => s.Key.ToLower().Contains(search.ToLower()) || s.Value.ToLower().Contains(search.ToLower())).ToArray();
+
+            if (!matches.Any()) return null;
+
+            returnValue = matches.Select(item => new StringBuilder(item.Key).Append("-").Append(item.Value)).Select(sb => sb.ToString()).ToList();
+            return returnValue;
+        }
+
+        private static void DownloadTickers(string fileName)
+        {
+            var path = GetFullFilePath(fileName);
             var url = string.Format(FtpSite + fileName);
             var request = (FtpWebRequest)WebRequest.Create(url);
             request.Method = WebRequestMethods.Ftp.DownloadFile;
-
-            // This example assumes the FTP site uses anonymous logon.
-            //request.Credentials = new NetworkCredential("anonymous", "janeDoe@contoso.com");
 
             var response = (FtpWebResponse)request.GetResponse();
 
             using (var responseStream = response.GetResponseStream())
             {
-                if (responseStream == null) return null;
+                if (responseStream == null) return;
                 using (var reader = new StreamReader(responseStream))
                 {
-                    data = reader.ReadToEnd();
+                    string data = reader.ReadToEnd();
+                    File.WriteAllText(path, data);
                 }
-            }
-            //var responseStream = response.GetResponseStream();
-            //if (responseStream != null)
-            //{
-            //    var reader = new StreamReader(responseStream);
-            //    data = reader.ReadToEnd();
-            //    reader.Close();
-            //}
-            //response.Close();  
-            return data;
+            }  
         }
 
-        //private static Dictionary<string, string> ProcessData(string data)
-        //{
-        //    var lines = data.Split('\n');
-        //    lines = lines.Skip(1).Take(lines.Length - 1).ToArray();
-        //    var symbolList = new Dictionary<string, string>();
-        //    foreach (var line in lines)
-        //    {
-        //        var segment = line.Split('|');
-        //        symbolList[segment[0]] = segment[1];
-        //    }
-
-        //    return symbolList;
-        //}
+        public static string GetFullFilePath(string fileName)
+        {
+            var baseDir = AppDomain.CurrentDomain.BaseDirectory;
+            var path = string.Format(baseDir + @"\" + fileName);
+            return path;
+        }
     }
 }

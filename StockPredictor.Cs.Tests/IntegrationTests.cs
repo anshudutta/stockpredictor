@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using NUnit.Framework;
 using StockPredictor.Services;
@@ -102,9 +103,26 @@ namespace StockPredictor.Cs.Tests
         [Test]
         public void GetStockTickers()
         {
+            var nasdaqFile = NasdaqStockEngine.GetFullFilePath("nasdaqlisted.txt");
+            if (File.Exists(nasdaqFile)) File.Delete(nasdaqFile);
+            var otherlisted = NasdaqStockEngine.GetFullFilePath("otherlisted.txt");
+            if (File.Exists(nasdaqFile)) File.Delete(otherlisted);
+
             var nasdaqStockEngine = new NasdaqStockEngine();
             var tickers = nasdaqStockEngine.GetStockTickers();
             Assert.IsTrue(tickers.Any());
+            Assert.IsTrue(File.Exists(nasdaqFile));
+            Assert.IsTrue(File.Exists(otherlisted));
+        }
+
+        [Test]
+        [TestCase("goo")]
+        [TestCase("msf")]
+        public void LookupSymbol(string searchTerm)
+        {
+            var nasdaqStockEngine = new NasdaqStockEngine();
+            var matches = nasdaqStockEngine.LookUpStock(searchTerm);
+            Assert.IsTrue(matches.Any(m => m.ToLower().Contains(searchTerm.ToLower())));
         }
     }
 }
