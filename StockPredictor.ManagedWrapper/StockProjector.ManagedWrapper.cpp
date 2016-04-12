@@ -23,7 +23,7 @@ NativeClassWrapper::!NativeClassWrapper() { delete m_nativeClass; }
 System::Collections::Generic::List<double>^ NativeClassWrapper::SimulateStockPrice(int days, long iterations, double price, double rate, double dividendYield, double volatility)
 {
 	std::vector<double> stockPrices = m_nativeClass->SimulateStockPrice(days, iterations, price, rate, dividendYield, volatility);
-	System::Collections::Generic::List<double> ^iColl;
+	System::Collections::Generic::List<double> ^iColl = gcnew System::Collections::Generic::List<double>();
 	for (std::vector<double>::iterator stockPrice = stockPrices.begin();
 		stockPrice != stockPrices.end(); ++stockPrice) {
 			iColl->Add(*stockPrice);

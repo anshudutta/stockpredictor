@@ -96,6 +96,7 @@ namespace StockPredictor.Cs.Tests
         {
             var manager = new StockManager {DataService = new DataService()};
             var stockPrices = manager.GetStockProjections(symbol, days);
+            Assert.IsTrue(stockPrices.Any());
         }
     }
 }
