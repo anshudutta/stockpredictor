@@ -14,50 +14,57 @@ namespace StockPredictor.Services
         private const string Nasdaq = "nasdaqlisted.txt";
         private const string Others = "otherlisted.txt";
         private static Dictionary<string, string> _stockTickers;
+        private static string _nasdaqListing;
+        private static string _otherListing;
 
         public NasdaqStockEngine()
         {
             _stockTickers = null;
+            Init();
+        }
+
+        private void Init()
+        {
+            if (_stockTickers != null) return;
+
+            _stockTickers = new Dictionary<string, string>();
+            _nasdaqListing = ProcessFiles(Nasdaq);
+            _otherListing = ProcessFiles(Others);
+
+            TrySaveFile(Nasdaq, _nasdaqListing);
+            TrySaveFile(Others, _otherListing);
+
+            _stockTickers = _nasdaqListing.ProcessData();
+            var otherListed = _otherListing.ProcessData();
+
+            if (otherListed == null) return;
+
+            foreach (var item in otherListed.Where(item => !_stockTickers.ContainsKey(item.Key)))
+            {
+                _stockTickers.Add(item.Key, item.Value);
+            } 
+
         }
 
         public Dictionary<string, string> GetStockTickers()
         {
-            if (_stockTickers != null) return _stockTickers;
-
-            _stockTickers = new Dictionary<string, string>();
-            ProcessFiles(Nasdaq);
-            ProcessFiles(Others);
-
-            if (File.Exists(GetFullFilePath(Nasdaq)))
-            {
-                _stockTickers = File.ReadAllText(GetFullFilePath(Nasdaq)).ProcessData();
-            }
-
-            if (!File.Exists(GetFullFilePath(Others))) return _stockTickers;
-            var otherListed = File.ReadAllText(GetFullFilePath(Nasdaq)).ProcessData();
-            foreach (var item in otherListed.Where(item => !_stockTickers.ContainsKey(item.Key)))
-            {
-                _stockTickers.Add(item.Key, item.Value);
-            }
-
+            
             return _stockTickers;
         }
 
-        private static void ProcessFiles(string fileName)
+        private static string ProcessFiles(string fileName)
         {
             var fullPath = GetFullFilePath(fileName);
-            if (File.Exists(fullPath) && File.GetCreationTime(fullPath) > DateTime.Now.AddDays(-1)) return;
+            if (File.Exists(fullPath) && File.GetCreationTime(fullPath) > DateTime.Now.AddDays(-1))
+                return File.ReadAllText(GetFullFilePath(fileName));
             File.Delete(fullPath);
-            DownloadTickers(fileName);
+            return GetTickers(fileName);
         }
 
         public List<string> LookUpStock(string search)
         {
-            if (_stockTickers == null)
-            {
-                GetStockTickers();
-            }
-
+            if (_stockTickers == null) return null;
+            
             List<string> returnValue = null;
             if (_stockTickers == null) return null;
             var matches = _stockTickers.Where(s => s.Key.ToLower().Contains(search.ToLower()) || s.Value.ToLower().Contains(search.ToLower())).ToArray();
@@ -68,7 +75,47 @@ namespace StockPredictor.Services
             return returnValue;
         }
 
-        private static void DownloadTickers(string fileName)
+        public int IsValidateSymbol(string symbol)
+        {
+            return _stockTickers == null ? -1 : _stockTickers.ContainsKey(symbol) ? 1 :0;
+        }
+
+        private static bool TrySaveFile(string filename, string data)
+        {
+            try
+            {
+                var path = GetFullFilePath(filename);
+                File.WriteAllText(path, data);
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            
+        }
+
+        //private static void DownloadTickers(string fileName)
+        //{
+        //    var path = GetFullFilePath(fileName);
+        //    var url = string.Format(FtpSite + fileName);
+        //    var request = (FtpWebRequest)WebRequest.Create(url);
+        //    request.Method = WebRequestMethods.Ftp.DownloadFile;
+
+        //    var response = (FtpWebResponse)request.GetResponse();
+
+        //    using (var responseStream = response.GetResponseStream())
+        //    {
+        //        if (responseStream == null) return;
+        //        using (var reader = new StreamReader(responseStream))
+        //        {
+        //            string data = reader.ReadToEnd();
+        //            File.WriteAllText(path, data);
+        //        }
+        //    }  
+        //}
+
+        private static string GetTickers(string fileName)
         {
             var path = GetFullFilePath(fileName);
             var url = string.Format(FtpSite + fileName);
@@ -79,13 +126,12 @@ namespace StockPredictor.Services
 
             using (var responseStream = response.GetResponseStream())
             {
-                if (responseStream == null) return;
+                if (responseStream == null) return null;
                 using (var reader = new StreamReader(responseStream))
                 {
-                    string data = reader.ReadToEnd();
-                    File.WriteAllText(path, data);
+                    return reader.ReadToEnd();
                 }
-            }  
+            }
         }
 
         public static string GetFullFilePath(string fileName)

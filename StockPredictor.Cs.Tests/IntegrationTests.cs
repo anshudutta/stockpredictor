@@ -122,7 +122,17 @@ namespace StockPredictor.Cs.Tests
         {
             var nasdaqStockEngine = new NasdaqStockEngine();
             var matches = nasdaqStockEngine.LookUpStock(searchTerm);
+            Assert.AreEqual(0, nasdaqStockEngine.IsValidateSymbol(searchTerm));
             Assert.IsTrue(matches.Any(m => m.ToLower().Contains(searchTerm.ToLower())));
+        }
+
+        [Test]
+        [TestCase("MSFT")]
+        [TestCase("GOOG")]
+        public void TestValidSymbol(string symbol)
+        {
+            var nasdaqStockEngine = new NasdaqStockEngine();
+            Assert.AreEqual(1, nasdaqStockEngine.IsValidateSymbol(symbol));
         }
     }
 }
