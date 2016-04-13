@@ -9,22 +9,80 @@ namespace StockPredictor.Console
 {
     class Program
     {
+        private static readonly StockManager StockManager = new StockManager();
         static void Main(string[] args)
         {
+            //Plotter.DoThePlot(Math.Sin);
+            StockManager.DataService = new DataService();
+            var arguments = new Arguments();
+
+            string message;
+            if (!IsValidArguments(args, arguments, out message))
+            {
+                System.Console.ForegroundColor = ConsoleColor.Red;
+                System.Console.WriteLine(message);
+                return;
+            }
+            
+            System.Console.WriteLine("Processing stock projection for {0} for the next {1} days", arguments.Symbol, arguments.Days);
+            System.Console.WriteLine(Environment.NewLine);
+            System.Console.ForegroundColor = ConsoleColor.Green;
+            try
+            {
+                var points = StockManager.GetStockProjections(arguments.Symbol, arguments.Days, System.Console.WriteLine);
+                System.Console.ForegroundColor = ConsoleColor.White;
+                System.Console.WriteLine("Projection at the end of {0} days = {1}", arguments.Days, points.Last());
+            }
+            catch (Exception ex)
+            {
+                System.Console.ForegroundColor = ConsoleColor.Red;
+                System.Console.WriteLine(string.Format("Something went wrong - {0}", ex.Message));
+            }
+        }
+
+        static bool IsValidArguments(string[] args, Arguments arguments, out string message)
+        {
+            bool valid = true;
+            var sb = new StringBuilder();
+
+            if (!args.Any())
+            {
+                message = "You need to provide the following parameters - symbol, days (default 1)";
+                return false;
+            }
+
             var symbol = args[0];
-            int days = 1;
+
             if (args.Count() == 2)
             {
                 var strDays = args[1];
+                int days = 1;
                 if (!int.TryParse(strDays, out days))
                 {
-                    System.Console.WriteLine("Invalid argument. No of projection days must be non zero int");
+                    sb.AppendLine("Invalid argument. No of projection days must be non zero int");
+                    valid = false;
+                }
+                else
+                {
+                    arguments.Days = days;
                 }
             }
-            
-            var stockManager = new StockManager();
-            var points = stockManager.GetStockProjections(symbol, days);
-            
+
+            if (StockManager.DataService.IsValidateSymbol(symbol) == 0)
+            {
+                valid = false;
+                sb.AppendLine(string.Format("{0} - Not a valid symbol. Did you mean?", symbol));
+                foreach (var item in StockManager.DataService.LookUpStock(symbol).Take(5))
+                {
+                    sb.AppendLine(item);
+                }
+            }
+            else
+            {
+                arguments.Symbol = symbol;
+            }
+            message = sb.ToString();
+            return valid;
         }
     }
 }

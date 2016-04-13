@@ -37,5 +37,24 @@ namespace StockPredictor.Services
             var returnValue = ConfigurationManager.AppSettings[key];
             return string.IsNullOrEmpty(returnValue) ? defaultValue : returnValue;
         }
+
+
+        public Dictionary<string, string> GetStockTickers()
+        {
+            var nasdaqStock = new NasdaqStockEngine();
+            return nasdaqStock.GetStockTickers();
+        }
+
+        public List<string> LookUpStock(string search)
+        {
+            var nasdaqStock = new NasdaqStockEngine();
+            return nasdaqStock.LookUpStock(search);
+        }
+
+        public int IsValidateSymbol(string symbol)
+        {
+            var nasdaqStock = new NasdaqStockEngine();
+            return nasdaqStock.IsValidateSymbol(symbol);
+        }
     }
 }

@@ -7,7 +7,6 @@ namespace StockPredictor.Services
 {
     public class StockManager
     {
-        //private static readonly NativeClassWrapper QuantLib = new NativeClassWrapper();
         public IDataService DataService { get; set; }
 
         public StockManager()
@@ -15,22 +14,52 @@ namespace StockPredictor.Services
             
         }
 
-        public double[] GetStockProjections(string symbol, int days)
+        public double[] GetStockProjections(string symbol, int days, Action<string> action)
         {
+            var percentageComplete = 0;
+            const int eachPart = 20;
+            if (action != null)
+            {
+                action(string.Format("{0}% Downloading yield curve..", percentageComplete));
+            }
             double rate1Year = DataService.GetYieldCurve()["1 YR"];
+            percentageComplete += eachPart;
+
+            if (action != null)
+            {
+                action(string.Format("{0}% Downloading stock quote..", percentageComplete)); 
+            }
             var stock = DataService.GetStockQuote(new List<string> {symbol}).First();
+            percentageComplete += eachPart;
+
+            if (action != null)
+            {
+                action(string.Format("{0}% Downloading implied volatility..", percentageComplete)); 
+            }
             double? impliedVolatility = DataService.GetImpliedVolatility(symbol);
+            percentageComplete += eachPart;
+
             int iterations = Convert.ToInt32(DataService.GetAppSettings("iterations", "10000000"));
             double price = (double)(stock.Ask + stock.Bid)/2;
             double dividendYield = stock.DividendYield.HasValue ? (double) stock.DividendYield.Value : 0;
 
             if (impliedVolatility.HasValue)
             {
+                if (action != null)
+                {
+                    action(string.Format("{0}% Running Simulation..", percentageComplete));
+                }
+                
                 using (var quantLib = new NativeClassWrapper())
                 {
-                    return quantLib.SimulateStockPrice(days, iterations, price, rate1Year, dividendYield, impliedVolatility.Value).ToArray();
+                    var result = quantLib.SimulateStockPrice(days, iterations, price, rate1Year, dividendYield, impliedVolatility.Value).ToArray();
+                    percentageComplete += eachPart;
+                    if (action != null)
+                    {
+                        action(string.Format("{0}% Completed", percentageComplete)); 
+                    }
+                    return result;
                 }
-
             }
             //else
             //{

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace StockPredictor.Services
 {
-    public class NasdaqStockEngine
+    class NasdaqStockEngine
     {
         private const string FtpSite = "ftp://ftp.nasdaqtrader.com/symboldirectory/";
         private const string Nasdaq = "nasdaqlisted.txt";
@@ -94,26 +94,6 @@ namespace StockPredictor.Services
             }
             
         }
-
-        //private static void DownloadTickers(string fileName)
-        //{
-        //    var path = GetFullFilePath(fileName);
-        //    var url = string.Format(FtpSite + fileName);
-        //    var request = (FtpWebRequest)WebRequest.Create(url);
-        //    request.Method = WebRequestMethods.Ftp.DownloadFile;
-
-        //    var response = (FtpWebResponse)request.GetResponse();
-
-        //    using (var responseStream = response.GetResponseStream())
-        //    {
-        //        if (responseStream == null) return;
-        //        using (var reader = new StreamReader(responseStream))
-        //        {
-        //            string data = reader.ReadToEnd();
-        //            File.WriteAllText(path, data);
-        //        }
-        //    }  
-        //}
 
         private static string GetTickers(string fileName)
         {

@@ -63,17 +63,17 @@ namespace StockPredictor.Cs.Tests
             string symbol)
         {
             var ds = new DataService();
-            var symbols = new List<string> { symbol };
 
-            var quote = ds.GetStockQuote(symbols).First();
-            Assert.IsTrue(quote.Bid > 0);
-            Assert.IsTrue(quote.Ask > 0);
-            Assert.IsTrue(quote.DividendYield > 0);
+            var options = ds.GetOptionData(symbol);
+            foreach (var option in options)
+            {
+                Assert.IsNotNull(option.ContractName);
 
-            Debug.WriteLine(quote.Symbol);
-            Debug.WriteLine(quote.Bid);
-            Debug.WriteLine(quote.Ask);
-            Debug.WriteLine(quote.DividendYield);
+                Debug.WriteLine(option.ContractName);
+                Debug.WriteLine(option.Bid);
+                Debug.WriteLine(option.Ask);
+            }
+            
         }
 
         [Test]
@@ -96,23 +96,16 @@ namespace StockPredictor.Cs.Tests
         public void StockManager_Simulates_Stock_Prices(string symbol, int days)
         {
             var manager = new StockManager {DataService = new DataService()};
-            var stockPrices = manager.GetStockProjections(symbol, days);
+            var stockPrices = manager.GetStockProjections(symbol, days, null);
             Assert.IsTrue(stockPrices.Any());
         }
 
         [Test]
-        public void GetStockTickers()
+        public void Data_Service_Returns_StockTickers()
         {
-            var nasdaqFile = NasdaqStockEngine.GetFullFilePath("nasdaqlisted.txt");
-            if (File.Exists(nasdaqFile)) File.Delete(nasdaqFile);
-            var otherlisted = NasdaqStockEngine.GetFullFilePath("otherlisted.txt");
-            if (File.Exists(nasdaqFile)) File.Delete(otherlisted);
-
-            var nasdaqStockEngine = new NasdaqStockEngine();
-            var tickers = nasdaqStockEngine.GetStockTickers();
+            var dataService = new DataService();
+            var tickers = dataService.GetStockTickers();
             Assert.IsTrue(tickers.Any());
-            Assert.IsTrue(File.Exists(nasdaqFile));
-            Assert.IsTrue(File.Exists(otherlisted));
         }
 
         [Test]
@@ -120,9 +113,9 @@ namespace StockPredictor.Cs.Tests
         [TestCase("msf")]
         public void LookupSymbol(string searchTerm)
         {
-            var nasdaqStockEngine = new NasdaqStockEngine();
-            var matches = nasdaqStockEngine.LookUpStock(searchTerm);
-            Assert.AreEqual(0, nasdaqStockEngine.IsValidateSymbol(searchTerm));
+            var dataService = new DataService();
+            var matches = dataService.LookUpStock(searchTerm);
+            Assert.AreEqual(0, dataService.IsValidateSymbol(searchTerm));
             Assert.IsTrue(matches.Any(m => m.ToLower().Contains(searchTerm.ToLower())));
         }
 
@@ -131,8 +124,8 @@ namespace StockPredictor.Cs.Tests
         [TestCase("GOOG")]
         public void TestValidSymbol(string symbol)
         {
-            var nasdaqStockEngine = new NasdaqStockEngine();
-            Assert.AreEqual(1, nasdaqStockEngine.IsValidateSymbol(symbol));
+            var dataService = new DataService();
+            Assert.AreEqual(1, dataService.IsValidateSymbol(symbol));
         }
     }
 }
