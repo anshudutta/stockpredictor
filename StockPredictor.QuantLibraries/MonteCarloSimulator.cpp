@@ -71,13 +71,7 @@ vector<double> MonteCarloSimulator::SimulateStockPrice(int days, long iterations
 	const double numberOfDaysInYear = 252;
 	double dailyVolatitily = volatility/sqrt(numberOfDaysInYear);
 	QuantFunctions quantFunctions;
-
-	//Initialize(days);
-	double **arrPaths = new double*[iterations];
-	for (int i = 0; i < iterations; i++)
-	{
-		arrPaths[i] = new double[days];
-	}
+	vector<vector<double>> arrPaths;
 
 	double mean = 0;
 	if (drift != 0)
@@ -85,40 +79,33 @@ vector<double> MonteCarloSimulator::SimulateStockPrice(int days, long iterations
 		mean = (drift - pow(dailyVolatitily,2)/2);
 	}
 	vector<double> _arrPriceByDay;
-	try
+	
+	_arrPriceByDay.reserve(days);
+	
+	for (int i = 0; i < iterations; i++)
 	{
-		_arrPriceByDay.reserve(days);
-
-		for (int i = 0; i < iterations; i++)
-		{
-			double price = currentPrice;
-			for (int day = 0; day < days; day++)
-			{
-				double random = ((double)rand()/(double)RAND_MAX);
-				double zValue = quantFunctions.GetInverseCDF(random);
-				double rateOfReturn = mean + zValue * dailyVolatitily;
-				price = price * exp(rateOfReturn);
-				arrPaths[i][day] = price;
-			}
-		}
-
+		vector<double> iteration;
+		double price = currentPrice;
 		for (int day = 0; day < days; day++)
 		{
-			double cumulative = 0;
-			for (int iteration = 0; iteration < iterations; iteration++)
-			{
-				cumulative += arrPaths[iteration][day];
-			}
-			_arrPriceByDay.push_back(cumulative/iterations);
+			double random = ((double)rand()/(double)RAND_MAX);
+			double zValue = quantFunctions.GetInverseCDF(random);
+			double rateOfReturn = mean + zValue * dailyVolatitily;
+			price = price * exp(rateOfReturn);
+			iteration.push_back(price);
 		}
-	}
-	catch(int ex)
-	{
-		delete[] arrPaths;
-		throw ex;
+		arrPaths.push_back(iteration);
 	}
 	
-	delete[] arrPaths;
+	for (int day = 0; day < days; day++)
+	{
+		double cumulative = 0;
+		for (int iteration = 0; iteration < iterations; iteration++)
+		{
+			cumulative += arrPaths[iteration][day];
+		}
+		_arrPriceByDay.push_back(cumulative/iterations);
+	}
 	return _arrPriceByDay;
 }
 
