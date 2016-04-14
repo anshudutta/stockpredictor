@@ -12,6 +12,7 @@ namespace StockPredictor.Console
         private static readonly StockManager StockManager = new StockManager();
         static void Main(string[] args)
         {
+            System.Console.ForegroundColor = ConsoleColor.White;
             System.Console.WriteLine("Initializing....");
             StockManager.DataService = new DataService();
             var arguments = new Arguments();
@@ -39,6 +40,7 @@ namespace StockPredictor.Console
             {
                 System.Console.ForegroundColor = ConsoleColor.Red;
                 System.Console.WriteLine(string.Format("Something went wrong - {0}", ex.Message));
+                System.Console.ForegroundColor = ConsoleColor.White;
             }
         }
 

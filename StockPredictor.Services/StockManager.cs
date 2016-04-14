@@ -44,7 +44,7 @@ namespace StockPredictor.Services
             double price = (double)(stock.Ask + stock.Bid)/2;
             double dividendYield = stock.DividendYield.HasValue ? (double) stock.DividendYield.Value : 0;
 
-            if (impliedVolatility.HasValue)
+            if (impliedVolatility != null)
             {
                 if (action != null)
                 {
