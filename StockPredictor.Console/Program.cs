@@ -12,7 +12,7 @@ namespace StockPredictor.Console
         private static readonly StockManager StockManager = new StockManager();
         static void Main(string[] args)
         {
-            //Plotter.DoThePlot(Math.Sin);
+            System.Console.WriteLine("Initializing....");
             StockManager.DataService = new DataService();
             var arguments = new Arguments();
 
@@ -31,7 +31,9 @@ namespace StockPredictor.Console
             {
                 var points = StockManager.GetStockProjections(arguments.Symbol, arguments.Days, System.Console.WriteLine);
                 System.Console.ForegroundColor = ConsoleColor.White;
-                System.Console.WriteLine("Projection at the end of {0} days = {1}", arguments.Days, points.Last());
+                System.Console.WriteLine("Projection at the end of {0} days = {1}", arguments.Days, Math.Round(points.Last(), 2));
+
+                //Plotter.DoThePlot((x) => x > points.Length - 1 ? 0 : points[(int) x]);
             }
             catch (Exception ex)
             {

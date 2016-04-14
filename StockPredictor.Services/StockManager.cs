@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using StockPredictorManagedWrapper;
 
 namespace StockPredictor.Services
@@ -34,7 +35,7 @@ namespace StockPredictor.Services
 
             if (action != null)
             {
-                action(string.Format("{0}% Downloading implied volatility..", percentageComplete)); 
+                action(string.Format("{0}% Calculating implied volatility..", percentageComplete)); 
             }
             double? impliedVolatility = DataService.GetImpliedVolatility(symbol);
             percentageComplete += eachPart;
@@ -56,7 +57,13 @@ namespace StockPredictor.Services
                     percentageComplete += eachPart;
                     if (action != null)
                     {
-                        action(string.Format("{0}% Completed", percentageComplete)); 
+                        action(string.Format("{0}% Completed", 100));
+                        action("\n");
+                        var sb = new StringBuilder();
+                        sb.AppendLine(string.Format("Symbol : {0}", symbol));
+                        sb.AppendLine(string.Format("Bid price : {0}", stock.Bid));
+                        sb.AppendLine(string.Format("Ask price : {0}", stock.Ask));
+                        action(sb.ToString());
                     }
                     return result;
                 }

@@ -42,7 +42,7 @@ namespace StockPredictor.Console
 
         public static void DoThePlot(Func del)
         {
-            PlotX(new []{0,1,2,3,4,5});
+            //PlotX(new []{0,1,2,3,4,5});
             
             FillUp(Line, withChar: Dot); // line of dots for "vertical" axis
             System.Console.WriteLine(Line);
@@ -61,10 +61,10 @@ namespace StockPredictor.Console
         private static void PlotFunc(Func f)
         {
             double maxval = 9.0; //arbitrary values
-            double delta = 0.2; //size of iteration steps
+            double delta = 1; //size of iteration steps
             int loc;
             Line[CHalf] = Dot; // for "horizontal" axis
-            for (double x = 0.0001; x < maxval; x += delta) //0.0001 to avoid DIV/0 error
+            for (double x = 1; x < 20; x += delta) //0.0001 to avoid DIV/0 error
             {
                 loc = (int)Math.Round(f(x) * CHalf) + CHalf;
                 Line[loc] = X;
