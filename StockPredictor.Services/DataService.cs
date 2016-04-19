@@ -56,5 +56,12 @@ namespace StockPredictor.Services
             var nasdaqStock = new NasdaqStockEngine();
             return nasdaqStock.IsValidateSymbol(symbol);
         }
+
+
+        public IEnumerable<HistoricalPrice> GetHistoricalQuote(string quote)
+        {
+            var yahooEngine = new YahooEngine();
+            return yahooEngine.FetchHistorical(quote);
+        }
     }
 }

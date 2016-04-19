@@ -27,7 +27,6 @@ namespace StockPredictor.Services
 
         private static IEnumerable<Option> Parse(string dom)
         {
-            //var volSmile = new Dictionary<double, double>();
             var optionList = new List<Option>();
             var source = WebUtility.HtmlDecode(dom);
             var resultat = new HtmlDocument();

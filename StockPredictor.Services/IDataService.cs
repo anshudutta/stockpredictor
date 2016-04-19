@@ -6,6 +6,7 @@ namespace StockPredictor.Services
     public interface IDataService
     {
         IEnumerable<Stock> GetStockQuote(List<string> quotes);
+        IEnumerable<HistoricalPrice> GetHistoricalQuote(string quote);
         IEnumerable<Option> GetOptionData(string symbol);
         double? GetImpliedVolatility(string symbol);
         Dictionary<string, double> GetYieldCurve();

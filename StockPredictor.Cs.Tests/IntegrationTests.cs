@@ -29,8 +29,7 @@ namespace StockPredictor.Cs.Tests
 
         [Test]
         [TestCase("CAB.AX")]
-        public void Data_Service_Returns_Null_For_NA_Symbol(
-            string symbol)
+        public void Data_Service_Returns_Null_For_NA_Symbol(string symbol)
         {
             var ds = new DataService();
             var impliedVol = ds.GetImpliedVolatility(symbol);
@@ -39,8 +38,7 @@ namespace StockPredictor.Cs.Tests
 
         [Test]
         [TestCase("MSFT")]
-        public void Data_Service_Returns_Valid_Quote(
-            string symbol)
+        public void Data_Service_Returns_Valid_Quote(string symbol)
         {
             var ds = new DataService();
             var symbols = new List<string>{symbol};
@@ -58,8 +56,17 @@ namespace StockPredictor.Cs.Tests
 
         [Test]
         [TestCase("MSFT")]
-        public void Data_Service_Returns_Valid_Options(
-            string symbol)
+        public void Data_Service_Returns_Valid_Historical_Quote(string symbol)
+        {
+            var ds = new DataService();
+
+            var quote = ds.GetHistoricalQuote(symbol);
+            Assert.IsTrue(quote.Any());
+        }
+
+        [Test]
+        [TestCase("MSFT")]
+        public void Data_Service_Returns_Valid_Options(string symbol)
         {
             var ds = new DataService();
 
