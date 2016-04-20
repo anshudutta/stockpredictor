@@ -69,6 +69,31 @@ namespace StockPredictorTests
 			double proceAtEndOfProjection = result[days-1];
 			Assert::AreNotEqual(0.0, proceAtEndOfProjection);
 		}
+
+		TEST_METHOD(Mean_Returns_Mean_Of_Distribution)
+		{
+			const int size = 5;
+			double x[size] = {1,2,3,4,5};
+			QuantFunctions quantFunctions;
+			Assert::AreEqual((double)3, quantFunctions.GetMean(x, size));
+		}
+
+		TEST_METHOD(SD_Returns_SD_Of_Distribution)
+		{
+			const int size = 7;
+			double x[size] = {10,2,38,23,38,23,21};
+			QuantFunctions quantFunctions;
+			Assert::AreEqual((double)12.299, quantFunctions.GetStandardDeviation(x, size));
+		}
+
+		TEST_METHOD(WSD_Returns_Weighted_SD_Of_Distribution)
+		{
+			const int size = 7;
+			double x[size] = {10,2,38,23,38,23,21};
+			QuantFunctions quantFunctions;
+			double stdDeviation = quantFunctions.GetWeightedStandardDeviation(x, size);
+			Assert::IsTrue(stdDeviation > 0);
+		}
 	private :
 		double round(double number)
 		{
