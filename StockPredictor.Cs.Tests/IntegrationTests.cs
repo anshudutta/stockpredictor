@@ -18,8 +18,7 @@ namespace StockPredictor.Cs.Tests
         [Test]
         [TestCase("MSFT")]
         [TestCase("GOOG")]
-        public void Data_Service_Returns_Volatility(
-            string symbol)
+        public void Data_Service_Returns_Volatility(string symbol)
         {
             var ds = new DataService();
             var impliedVol = ds.GetImpliedVolatility(symbol);
@@ -99,6 +98,7 @@ namespace StockPredictor.Cs.Tests
 
         [Test]
         [TestCase("MSFT",5)]
+        [TestCase("CBA.AX", 5)]
         public void StockManager_Simulates_Stock_Prices(string symbol, int days)
         {
             var manager = new StockManager {DataService = new DataService()};

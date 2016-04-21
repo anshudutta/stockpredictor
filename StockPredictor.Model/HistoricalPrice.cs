@@ -12,6 +12,7 @@ namespace StockPredictor.Model
         public double Close { get; set; }
         public int Volume { get; set; }
         public double AdjClose { get; set; }
+        public double DailyReturn { get; set; }
 
         public override string ToString()
         {

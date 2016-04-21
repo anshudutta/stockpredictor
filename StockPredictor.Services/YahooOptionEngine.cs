@@ -59,7 +59,7 @@ namespace StockPredictor.Services
                     var option = new Option
                     {
                         Strike = strike,
-                        ImpliedVolatility = vol,
+                        ImpliedVolatility = vol/100,
                         Bid = bid,
                         Ask = ask,
                         ContractName = contractName

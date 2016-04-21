@@ -113,8 +113,8 @@ double MonteCarloSimulator::GetDrift(double rate, double dividendYield)
 {
 	QuantFunctions quantFunctions;
 	double dailyRate = quantFunctions.GetDailyRateFromYearlyRate(rate);
-	dividendYield = quantFunctions.GetDailyRateFromYearlyRate(dividendYield);
-	double drift = dailyRate - dividendYield;
+	double dailyDividend = quantFunctions.GetDailyRateFromYearlyRate(dividendYield);
+	double drift = dailyRate - dailyDividend;
 	return drift > 0 ? drift : 0;;
 }
 

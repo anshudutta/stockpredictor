@@ -26,7 +26,7 @@ namespace StockPredictor.Console
             }
             
             System.Console.WriteLine("Processing stock projection for {0} for the next {1} days", arguments.Symbol, arguments.Days);
-            System.Console.WriteLine(Environment.NewLine);
+            //System.Console.WriteLine(Environment.NewLine);
             System.Console.ForegroundColor = ConsoleColor.Green;
             try
             {
