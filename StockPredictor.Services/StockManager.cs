@@ -94,7 +94,9 @@ namespace StockPredictor.Services
                     sb.AppendLine(string.Format("Symbol : {0}", symbol));
                     sb.AppendLine(string.Format("Bid price : {0}", stock.Bid));
                     sb.AppendLine(string.Format("Ask price : {0}", stock.Ask));
-                    sb.AppendLine(string.Format("Parameters : Volatility : {0}, Rsk free Rate : {1}, Dividend : {2} ", volatility, rate1Year, (int)dividendYield == 0? "Not Available": dividendYield.ToString()));
+                    sb.AppendLine(string.Format("Volatility %: {0} ", Math.Round(volatility.Value * 100, 2)));
+                    sb.AppendLine(string.Format("Rsk free Rate %: {0}", Math.Round(rate1Year * 100, 2)));
+                    sb.AppendLine(string.Format("Dividend %: {0}",(int)dividendYield == 0? "Not Available": Math.Round(rate1Year * 100, 2).ToString()));
                     action(sb.ToString());
                 }
                 return result;
