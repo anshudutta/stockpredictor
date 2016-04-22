@@ -20,14 +20,14 @@ namespace StockPredictor.Services
                                              "%22%20and%20startDate%20%3D%20%22{1}%22%20and%20endDate%20%3D%20%22{2}%" +
                                              "22&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=";
 
-        public IEnumerable<Stock> Fetch(IEnumerable<string> symbols)
+        public IEnumerable<Stock> Fetch(IEnumerable<string> symbols, out List<string> errors)
         {
             var enumerable = symbols.ToArray();
             var symbolList = String.Join("%2C", enumerable.Select(w => "%22" + w + "%22").ToArray());
             var url = string.Format(BaseUrl,symbolList);
  
             var doc = XDocument.Load(url);
-            return Parse(enumerable,doc);
+            return Parse(enumerable, doc, out errors);
         }
 
         public IEnumerable<HistoricalPrice> FetchHistorical(string symbol)
@@ -84,8 +84,9 @@ namespace StockPredictor.Services
             return historicalPrices;
         }
  
-        private static IEnumerable<Stock> Parse(IEnumerable<string> symbols, XDocument doc)
+        private static IEnumerable<Stock> Parse(IEnumerable<string> symbols, XDocument doc, out List<string> errors)
         {
+            errors = null;
             if (doc.Root == null) return null;
             var results = doc.Root.Element("results");
             var quotes = new List<Stock>();
@@ -94,7 +95,13 @@ namespace StockPredictor.Services
             {
                 var quote = new Stock {Symbol = symbol};
                 var q = results.Elements("quote").First(w => w.Attribute("symbol").Value == quote.Symbol);
- 
+
+                if (string.IsNullOrEmpty(q.Element("Ask").Value))
+                {
+                    if (errors == null)
+                        errors = new List<string>();
+                    errors.Add(symbol);
+                }
                 quote.Ask = GetDecimal(q.Element("Ask").Value);
                 quote.Bid = GetDecimal(q.Element("Bid").Value);
                 quote.AverageDailyVolume = GetDecimal(q.Element("AverageDailyVolume").Value);

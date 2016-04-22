@@ -18,7 +18,7 @@ namespace StockPredictor.Cs.Tests
         [Test]
         [TestCase("MSFT")]
         [TestCase("GOOG")]
-        public void Data_Service_Returns_Volatility(string symbol)
+        public void GetImpliedVolatility_Returns_Volatility(string symbol)
         {
             var ds = new DataService();
             var impliedVol = ds.GetImpliedVolatility(symbol);
@@ -28,7 +28,7 @@ namespace StockPredictor.Cs.Tests
 
         [Test]
         [TestCase("CAB.AX")]
-        public void Data_Service_Returns_Null_For_NA_Symbol(string symbol)
+        public void GetImpliedVolatility_Returns_Null_For_NA_Symbol(string symbol)
         {
             var ds = new DataService();
             var impliedVol = ds.GetImpliedVolatility(symbol);
@@ -37,12 +37,13 @@ namespace StockPredictor.Cs.Tests
 
         [Test]
         [TestCase("MSFT")]
-        public void Data_Service_Returns_Valid_Quote(string symbol)
+        public void GetStockQuote_Returns_Valid_Quote(string symbol)
         {
             var ds = new DataService();
             var symbols = new List<string>{symbol};
 
-            var quote = ds.GetStockQuote(symbols).First();
+            List<string> errors;
+            var quote = ds.GetStockQuote(symbols, out errors).First();
             Assert.IsTrue(quote.Bid > 0);
             Assert.IsTrue(quote.Ask > 0);
             Assert.IsTrue(quote.DividendYield > 0);
@@ -54,8 +55,20 @@ namespace StockPredictor.Cs.Tests
         }
 
         [Test]
+        [TestCase("XYZ")]
+        public void GetStockQuote_With_Invalid_Quote_Returns_Error(string symbol)
+        {
+            var ds = new DataService();
+            var symbols = new List<string> { symbol };
+
+            List<string> errors;
+            var quote = ds.GetStockQuote(symbols, out errors).First();
+            Assert.IsTrue(errors.Contains(symbol));
+        }
+
+        [Test]
         [TestCase("MSFT")]
-        public void Data_Service_Returns_Valid_Historical_Quote(string symbol)
+        public void GetHistoricalQuote_Returns_Valid_Historical_Quote(string symbol)
         {
             var ds = new DataService();
 
@@ -65,7 +78,7 @@ namespace StockPredictor.Cs.Tests
 
         [Test]
         [TestCase("MSFT")]
-        public void Data_Service_Returns_Valid_Options(string symbol)
+        public void GetOptionData_Returns_Valid_Options(string symbol)
         {
             var ds = new DataService();
 
@@ -87,7 +100,7 @@ namespace StockPredictor.Cs.Tests
         [TestCase("6 MO")]
         [TestCase("1 YR")]
         [TestCase("2 YR")]
-        public void Data_Service_Returns_Yield_Curve(string term)
+        public void GetYieldCurve_Returns_Yield_Curve(string term)
         {
             var ds = new DataService();
             var yc = ds.GetYieldCurve();
@@ -99,15 +112,16 @@ namespace StockPredictor.Cs.Tests
         [Test]
         [TestCase("MSFT",5)]
         [TestCase("CBA.AX", 5)]
-        public void StockManager_Simulates_Stock_Prices(string symbol, int days)
+        public void GetStockProjections_Simulates_Stock_Prices(string symbol, int days)
         {
             var manager = new StockManager {DataService = new DataService()};
             var stockPrices = manager.GetStockProjections(symbol, days, null);
             Assert.IsTrue(stockPrices.Any());
         }
 
+
         [Test]
-        public void Data_Service_Returns_StockTickers()
+        public void GetStockTickers_Returns_StockTickers()
         {
             var dataService = new DataService();
             var tickers = dataService.GetStockTickers();

@@ -78,6 +78,7 @@
     <Compile Include="NasdaqStockEngine.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QuandlEngine.cs" />
+    <Compile Include="StatusType.cs" />
     <Compile Include="StockManager.cs" />
     <Compile Include="YahooOptionEngine.cs" />
     <Compile Include="YahooStockEngine.cs" />

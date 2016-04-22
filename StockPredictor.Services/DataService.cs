@@ -8,10 +8,10 @@ namespace StockPredictor.Services
 {
     public class DataService : IDataService
     {
-        public IEnumerable<Stock> GetStockQuote(List<string> quotes)
+        public IEnumerable<Stock> GetStockQuote(List<string> quotes, out List<string> errors)
         {
             var engine = new YahooEngine();
-            return engine.Fetch(quotes);
+            return engine.Fetch(quotes, out errors);
         }
 
         public IEnumerable<Option> GetOptionData(string symbol)
