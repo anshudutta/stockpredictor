@@ -24,7 +24,7 @@ namespace StockPredictor.Services
         {
             var options = GetOptionData(symbol) ;
             var enumerable = options as Option[] ?? options.ToArray();
-            return options == null || !enumerable.Any() ? (double?) null : enumerable.Average(o => o.ImpliedVolatility) / 100;
+            return options == null || !enumerable.Any() ? (double?) null : enumerable.Where(o=> o.ImpliedVolatility>0).Average(o => o.ImpliedVolatility);
         }
 
         //public double? GetHistoricalVolatility(string symbol)

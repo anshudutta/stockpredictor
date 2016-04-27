@@ -76,7 +76,7 @@ namespace StockPredictor.Services
             }
             ReportStatus(action, string.Format("{0}% Finished calculating volatility..", percentageComplete), StatusType.Success);
 
-            int iterations = Convert.ToInt32(DataService.GetAppSettings("iterations", "1000000"));
+            int iterations = Convert.ToInt32(DataService.GetAppSettings("iterations", "500000"));
             double price = (double)(stock.Ask + stock.Bid)/2;
             double dividendYield = stock.DividendYield.HasValue ? (double) stock.DividendYield.Value : 0;
 
@@ -105,7 +105,7 @@ namespace StockPredictor.Services
                 sb.AppendLine(string.Format("Exchange : {0}", stock.StockExchange));
                 sb.AppendLine(string.Format("Volatility %: {0} ", Math.Round(volatility.Value * 100, 2)));
                 sb.AppendLine(string.Format("Rsk free Rate %: {0}", Math.Round(rate1Year * 100, 2)));
-                sb.AppendLine(string.Format("Dividend %: {0}",(int)dividendYield == 0? "Not Available": Math.Round(rate1Year * 100, 2).ToString()));
+                sb.AppendLine(string.Format("Dividend %: {0}", dividendYield == 0 ? "Not Available" : Math.Round(dividendYield * 100, 2).ToString()));
                 ReportStatus(action,sb.ToString(),StatusType.Info);
                 return result;
             }
