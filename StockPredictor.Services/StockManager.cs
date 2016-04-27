@@ -20,10 +20,10 @@ namespace StockPredictor.Services
         {
             var percentageComplete = 0;
             const int eachPart = 20;
-            
-            double rate1Year = DataService.GetYieldCurve()["1 YR"];
+
+            double rate1Year = Math.Round(DataService.GetYieldCurve()["1 YR"], 4);
             percentageComplete += eachPart;
-            ReportStatus(action, string.Format("{0}% FInished Downloading yield curve..", percentageComplete), StatusType.Success);
+            ReportStatus(action, string.Format("{0}% Finished downloading yield curve..", percentageComplete), StatusType.Success);
 
             List<string> errors;
             var stock = DataService.GetStockQuote(new List<string> { symbol }, out errors).First();
@@ -68,33 +68,36 @@ namespace StockPredictor.Services
                     volatility = quantLib.GetWeightedStandardDeviation(dailyReturns);
                 }
             }
-
+            
             if (volatility == 0)
             {
                 ReportStatus(action,string.Format("Unable to estimate volatility for {0}", symbol), StatusType.Fail);
                 return null;
             }
+
+            volatility = Math.Round(volatility.Value, 4);
             ReportStatus(action, string.Format("{0}% Finished calculating volatility..", percentageComplete), StatusType.Success);
 
             int iterations = Convert.ToInt32(DataService.GetAppSettings("iterations", "500000"));
-            double price = (double)(stock.Ask + stock.Bid)/2;
-            double dividendYield = stock.DividendYield.HasValue ? (double) stock.DividendYield.Value : 0;
+            double price = Math.Round((double)(stock.Ask + stock.Bid)/2, 2);
+            double dividendYield = Math.Round(stock.DividendYield.HasValue ? (double) stock.DividendYield.Value : 0, 4);
 
             using (var quantLib = new NativeClassWrapper())
             {
                 ReportStatus(action, "Running simulation...", StatusType.Info);
                 double[] result;
-                if ((int)dividendYield != 0 || (int)rate1Year != 0)
+                if (dividendYield == 0.0 || rate1Year == 0.0)
                 {
                     result =
-                    quantLib.SimulateStockPrice(days, iterations, price, rate1Year, dividendYield,
+                    quantLib.SimulateStockPrice(days, iterations, price,
                         volatility.Value).ToArray();
                 }
                 else
                 {
                     result =
-                    quantLib.SimulateStockPrice(days, iterations, price,
+                    quantLib.SimulateStockPrice(days, iterations, price, rate1Year, dividendYield,
                         volatility.Value).ToArray();
+                    
                 }
                 if (action == null) return result;
                 ReportStatus(action,string.Format("100% Completed"), StatusType.Success);
