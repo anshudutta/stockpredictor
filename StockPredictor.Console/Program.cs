@@ -12,10 +12,19 @@ namespace StockPredictor.Console
         private static readonly StockManager StockManager = new StockManager();
         static void Main(string[] args)
         {
-            System.Console.ForegroundColor = ConsoleColor.White;
-            System.Console.WriteLine("Initializing....");
+            
+            //System.Console.ForegroundColor = ConsoleColor.White;
+            System.Console.WriteLine("Warming up....");
             StockManager.DataService = new DataService();
             var arguments = new Arguments();
+
+            if (args == null || !args.Any())
+            {
+                System.Console.ForegroundColor = ConsoleColor.Red;
+                System.Console.WriteLine("Arguments missing - symbol, days");
+                System.Console.ForegroundColor = ConsoleColor.Gray;
+                return;
+            }
 
             string message;
             if (!IsValidArguments(args, arguments, out message))
@@ -25,22 +34,44 @@ namespace StockPredictor.Console
                 return;
             }
             
-            System.Console.WriteLine("Processing stock projection for {0} for the next {1} days", arguments.Symbol, arguments.Days);
-            System.Console.WriteLine(Environment.NewLine);
+            System.Console.WriteLine("Projecting {0} for the next {1} days", arguments.Symbol, arguments.Days);
             System.Console.ForegroundColor = ConsoleColor.Green;
             try
             {
-                var points = StockManager.GetStockProjections(arguments.Symbol, arguments.Days, System.Console.WriteLine);
-                System.Console.ForegroundColor = ConsoleColor.White;
-                System.Console.WriteLine("Projection at the end of {0} days = {1}", arguments.Days, Math.Round(points.Last(), 2));
-
+                var points = StockManager.GetStockProjections(arguments.Symbol, arguments.Days, (s, st) =>
+                {
+                    switch (st)
+                    {
+                        case StatusType.Info:
+                            System.Console.ForegroundColor = ConsoleColor.Gray;
+                            break;
+                        case StatusType.Success:
+                            System.Console.ForegroundColor = ConsoleColor.Green;
+                            break;
+                        case StatusType.Warn:
+                            System.Console.ForegroundColor = ConsoleColor.DarkCyan;
+                            break;
+                        case StatusType.Fail:
+                            System.Console.ForegroundColor = ConsoleColor.Red;
+                            break;
+                    }
+                    System.Console.WriteLine(s);
+                });
+                if (points != null && points.Any())
+                {
+                    System.Console.ForegroundColor = ConsoleColor.White;
+                    System.Console.WriteLine("Projected({0}) days = {1}", arguments.Days, Math.Round(points.Last(), 2));
+                }
                 //Plotter.DoThePlot((x) => x > points.Length - 1 ? 0 : points[(int) x]);
             }
             catch (Exception ex)
             {
                 System.Console.ForegroundColor = ConsoleColor.Red;
-                System.Console.WriteLine(string.Format("Something went wrong - {0}", ex.Message));
-                System.Console.ForegroundColor = ConsoleColor.White;
+                System.Console.WriteLine("Something went wrong - {0}", ex.Message);
+            }
+            finally
+            {
+                System.Console.ForegroundColor = ConsoleColor.Gray;
             }
         }
 
@@ -55,7 +86,7 @@ namespace StockPredictor.Console
                 return false;
             }
 
-            var symbol = args[0];
+            arguments.Symbol = args[0];
 
             if (args.Count() == 2)
             {
@@ -70,20 +101,6 @@ namespace StockPredictor.Console
                 {
                     arguments.Days = days;
                 }
-            }
-
-            if (StockManager.DataService.IsValidateSymbol(symbol) == 0)
-            {
-                valid = false;
-                sb.AppendLine(string.Format("{0} - Not a valid symbol. Did you mean?", symbol));
-                foreach (var item in StockManager.DataService.LookUpStock(symbol).Take(5))
-                {
-                    sb.AppendLine(item);
-                }
-            }
-            else
-            {
-                arguments.Symbol = symbol;
             }
             message = sb.ToString();
             return valid;

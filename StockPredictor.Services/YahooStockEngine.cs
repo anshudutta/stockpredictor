@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Xml.Linq;
+using Newtonsoft.Json.Linq;
+using RestSharp;
 using StockPredictor.Model;
 
 namespace StockPredictor.Services
@@ -12,18 +15,78 @@ namespace StockPredictor.Services
                                         "select%20*%20from%20yahoo.finance.quotes%20where%20symbol%20in%20({0})" +
                                         "&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys";
 
-        public IEnumerable<Stock> Fetch(IEnumerable<string> symbols)
+        private const string HistoricalUrl = "https://query.yahooapis.com/v1/public/yql?q=select%20*%20" +
+                                             "from%20yahoo.finance.historicaldata%20where%20symbol%20%3D%20%22{0}" +
+                                             "%22%20and%20startDate%20%3D%20%22{1}%22%20and%20endDate%20%3D%20%22{2}%" +
+                                             "22&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=";
+
+        public IEnumerable<Stock> Fetch(IEnumerable<string> symbols, out List<string> errors)
         {
             var enumerable = symbols.ToArray();
             var symbolList = String.Join("%2C", enumerable.Select(w => "%22" + w + "%22").ToArray());
             var url = string.Format(BaseUrl,symbolList);
  
             var doc = XDocument.Load(url);
-            return Parse(enumerable,doc);
+            return Parse(enumerable, doc, out errors);
+        }
+
+        public IEnumerable<HistoricalPrice> FetchHistorical(string symbol)
+        {
+            var startDate = DateTime.Now.AddYears(-1).ToString("yyyy-MM-dd");
+            var endDate = DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd");
+
+            var url = string.Format(HistoricalUrl, symbol, startDate, endDate);
+
+            var client = new RestClient(url);
+            var request = new RestRequest( Method.POST);
+            var response = client.Execute(request);
+            var content = response.Content;
+            var jObject = JObject.Parse(content);
+            return ParseHistorical(jObject);
+        }
+
+        private static IEnumerable<HistoricalPrice> ParseHistorical(JObject historical)
+        {
+            var historicalPrices = new List<HistoricalPrice>();
+            var quotes = historical["query"]["results"]["quote"];
+            foreach (var quote in quotes)
+            {
+                DateTime date;
+                double open;
+                double high;
+                double low;
+                double close;
+                int volume;
+                double adjCLose;
+                
+                var symbol = quote["Symbol"].ToString();
+                DateTime.TryParse(quote["Date"].ToString(), out date);
+                double.TryParse(quote["Open"].ToString(), out open);
+                double.TryParse(quote["High"].ToString(), out high);
+                double.TryParse(quote["Low"].ToString(), out low);
+                double.TryParse(quote["Close"].ToString(), out close);
+                int.TryParse(quote["Volume"].ToString(), out volume);
+                double.TryParse(quote["Adj_Close"].ToString(), out adjCLose);
+
+                var historicalPrice = new HistoricalPrice
+                {
+                    Symbol = symbol,
+                    Open = open,
+                    Close = close,
+                    High = high,
+                    Low = low,
+                    Date = date,
+                    AdjClose = adjCLose,
+                    Volume = volume
+                };
+                historicalPrices.Add(historicalPrice);
+            }
+            return historicalPrices;
         }
  
-        private static IEnumerable<Stock> Parse(IEnumerable<string> symbols, XDocument doc)
+        private static IEnumerable<Stock> Parse(IEnumerable<string> symbols, XDocument doc, out List<string> errors)
         {
+            errors = null;
             if (doc.Root == null) return null;
             var results = doc.Root.Element("results");
             var quotes = new List<Stock>();
@@ -32,7 +95,13 @@ namespace StockPredictor.Services
             {
                 var quote = new Stock {Symbol = symbol};
                 var q = results.Elements("quote").First(w => w.Attribute("symbol").Value == quote.Symbol);
- 
+
+                if (string.IsNullOrEmpty(q.Element("Ask").Value))
+                {
+                    if (errors == null)
+                        errors = new List<string>();
+                    errors.Add(symbol);
+                }
                 quote.Ask = GetDecimal(q.Element("Ask").Value);
                 quote.Bid = GetDecimal(q.Element("Bid").Value);
                 quote.AverageDailyVolume = GetDecimal(q.Element("AverageDailyVolume").Value);

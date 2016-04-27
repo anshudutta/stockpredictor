@@ -27,7 +27,6 @@ namespace StockPredictor.Services
 
         private static IEnumerable<Option> Parse(string dom)
         {
-            //var volSmile = new Dictionary<double, double>();
             var optionList = new List<Option>();
             var source = WebUtility.HtmlDecode(dom);
             var resultat = new HtmlDocument();
@@ -60,7 +59,7 @@ namespace StockPredictor.Services
                     var option = new Option
                     {
                         Strike = strike,
-                        ImpliedVolatility = vol,
+                        ImpliedVolatility = vol/100,
                         Bid = bid,
                         Ask = ask,
                         ContractName = contractName

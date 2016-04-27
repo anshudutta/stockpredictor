@@ -89,6 +89,54 @@ double QuantFunctions::GetDailyRateFromYearlyRate(double rate)
 	return pow((1+rate), 1/365) - 1;
 }
 
+double QuantFunctions::GetStandardDeviation(double* distribution, long size)
+{
+	double mean = GetMean(distribution, size);
+	double cumulativeDeviation = 0;
+	for (int i = 0; i < size; i++)
+	{
+		cumulativeDeviation += pow(distribution[i] - mean, 2);
+	}
+	return sqrt(cumulativeDeviation/size);
+}
+
+double QuantFunctions::GetWeightedStandardDeviation(double* distribution, long size)
+{
+	double mean = GetMean(distribution, size);
+	double cumulativeDeviation = 0;
+	double* sqDeviation = new double[size];
+	for (int i = 0; i < size; i++)
+	{
+		sqDeviation[i] = pow(distribution[i] - mean, 2);
+	}
+	double stdDeviation = sqrt(GetEWMA(sqDeviation, size));
+	delete sqDeviation;
+	return stdDeviation;
+}
+
+double QuantFunctions::GetMean(double* distribution, long size)
+{
+	double mean;
+	double cumulative = 0;
+	for (int i = 0; i < size; i++)
+	{
+		cumulative += distribution[i];
+	}
+	mean = cumulative/size;
+	return mean;
+}
+
+double QuantFunctions::GetEWMA(double* distribution, long size)
+{
+	const double lambda = 0.94;
+	double mean = 0;
+	for (int i = 0; i < size; i++)
+	{
+		mean += (1-lambda)*pow(lambda,i)*distribution[i];
+	}
+	return mean;
+}
+
 QuantFunctions::~QuantFunctions(void)
 {
 }

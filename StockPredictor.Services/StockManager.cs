@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using StockPredictorManagedWrapper;
 
@@ -15,75 +16,107 @@ namespace StockPredictor.Services
             
         }
 
-        public double[] GetStockProjections(string symbol, int days, Action<string> action)
+        public double[] GetStockProjections(string symbol, int days, Action<string, StatusType> action)
         {
             var percentageComplete = 0;
             const int eachPart = 20;
-            if (action != null)
-            {
-                action(string.Format("{0}% Downloading yield curve..", percentageComplete));
-            }
+            
             double rate1Year = DataService.GetYieldCurve()["1 YR"];
             percentageComplete += eachPart;
+            ReportStatus(action, string.Format("{0}% FInished Downloading yield curve..", percentageComplete), StatusType.Success);
 
-            if (action != null)
+            List<string> errors;
+            var stock = DataService.GetStockQuote(new List<string> { symbol }, out errors).First();
+            if (errors != null && errors.Contains(symbol))
             {
-                action(string.Format("{0}% Downloading stock quote..", percentageComplete)); 
+                var sb = new StringBuilder(string.Format("Unable to retrieve stock quote for {0}. ", symbol));
+                if (DataService.IsValidateSymbol(symbol) == 0)
+                {
+                    sb.AppendLine(string.Format("Not a valid symbol. ", symbol));
+                    var lookUp = DataService.LookUpStock(symbol);
+                    if (lookUp == null)
+                    {
+                        sb.Append("No matching symbols found");
+                    }
+                    else
+                    {
+                        sb.Append("Did you mean?");
+                        sb.AppendLine("");
+                        foreach (var item in lookUp.Take(5))
+                        {
+                            sb.AppendLine(item);
+                        }
+                    }
+                }
+                ReportStatus(action, sb.ToString(), StatusType.Fail);
+                return null;
             }
-            var stock = DataService.GetStockQuote(new List<string> {symbol}).First();
-            percentageComplete += eachPart;
 
-            if (action != null)
+            percentageComplete += eachPart;
+            ReportStatus(action, string.Format("{0}% Finished downloading stock quote..", percentageComplete), StatusType.Success);
+
+            double? volatility = DataService.GetImpliedVolatility(symbol);
+            percentageComplete += eachPart;
+            if (volatility == null)
             {
-                action(string.Format("{0}% Calculating implied volatility..", percentageComplete)); 
+                var sb = new StringBuilder();
+                sb.AppendLine("Unable to calculate Implied Volatility. Using Historical Volatility...");
+                ReportStatus(action, sb.ToString(), StatusType.Warn);
+                using (var quantLib = new NativeClassWrapper())
+                {
+                    var dailyReturns = DataService.GetHistoricalQuote(symbol).Select(p => p.DailyReturn).ToList();
+                    volatility = quantLib.GetWeightedStandardDeviation(dailyReturns);
+                }
             }
-            double? impliedVolatility = DataService.GetImpliedVolatility(symbol);
-            percentageComplete += eachPart;
 
-            int iterations = Convert.ToInt32(DataService.GetAppSettings("iterations", "10000000"));
+            if (volatility == 0)
+            {
+                ReportStatus(action,string.Format("Unable to estimate volatility for {0}", symbol), StatusType.Fail);
+                return null;
+            }
+            ReportStatus(action, string.Format("{0}% Finished calculating volatility..", percentageComplete), StatusType.Success);
+
+            int iterations = Convert.ToInt32(DataService.GetAppSettings("iterations", "500000"));
             double price = (double)(stock.Ask + stock.Bid)/2;
             double dividendYield = stock.DividendYield.HasValue ? (double) stock.DividendYield.Value : 0;
 
-            if (impliedVolatility != null)
+            using (var quantLib = new NativeClassWrapper())
             {
-                if (action != null)
+                ReportStatus(action, "Running simulation...", StatusType.Info);
+                double[] result;
+                if ((int)dividendYield != 0 || (int)rate1Year != 0)
                 {
-                    action(string.Format("{0}% Running Simulation..", percentageComplete));
+                    result =
+                    quantLib.SimulateStockPrice(days, iterations, price, rate1Year, dividendYield,
+                        volatility.Value).ToArray();
                 }
-                
-                using (var quantLib = new NativeClassWrapper())
+                else
                 {
-                    var result = quantLib.SimulateStockPrice(days, iterations, price, rate1Year, dividendYield, impliedVolatility.Value).ToArray();
-                    percentageComplete += eachPart;
-                    if (action != null)
-                    {
-                        action(string.Format("{0}% Completed", 100));
-                        action("\n");
-                        var sb = new StringBuilder();
-                        sb.AppendLine(string.Format("Symbol : {0}", symbol));
-                        sb.AppendLine(string.Format("Bid price : {0}", stock.Bid));
-                        sb.AppendLine(string.Format("Ask price : {0}", stock.Ask));
-                        action(sb.ToString());
-                    }
-                    return result;
+                    result =
+                    quantLib.SimulateStockPrice(days, iterations, price,
+                        volatility.Value).ToArray();
                 }
+                if (action == null) return result;
+                ReportStatus(action,string.Format("100% Completed"), StatusType.Success);
+                var sb = new StringBuilder();
+                sb.AppendLine(string.Format("Symbol : {0}", symbol));
+                sb.AppendLine(string.Format("Bid price : {0}", stock.Bid));
+                sb.AppendLine(string.Format("Ask price : {0}", stock.Ask));
+                sb.AppendLine(string.Format("Exchange : {0}", stock.StockExchange));
+                sb.AppendLine(string.Format("Volatility %: {0} ", Math.Round(volatility.Value * 100, 2)));
+                sb.AppendLine(string.Format("Rsk free Rate %: {0}", Math.Round(rate1Year * 100, 2)));
+                sb.AppendLine(string.Format("Dividend %: {0}", dividendYield == 0 ? "Not Available" : Math.Round(dividendYield * 100, 2).ToString()));
+                ReportStatus(action,sb.ToString(),StatusType.Info);
+                return result;
             }
-            //else
-            //{
-            //    // historical Volatility
-            //}
-            return null;
         }
 
-        //private static double[] GetSimulationResult(int days, long iterations, double currentPrice, double rate, double dividendYield, double volatility)
-        //{
-        //    return QuantLibraryWrapper.SimulateStockPrice(days, iterations, currentPrice, rate, dividendYield, volatility);
-        //}
-
-        //public void Dispose()
-        //{
-        //    Marshal.ReleaseComObject(QuantLib);
-        //}
-    
+        private static void ReportStatus(Action<string, StatusType> action, string status, StatusType statusType)
+        {
+            if (action != null)
+            {
+                action(status, statusType);
+            }
+        }
     }
 }
