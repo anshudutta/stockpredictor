@@ -23,7 +23,7 @@ namespace StockPredictor.Services
 
             double rate1Year = Math.Round(DataService.GetYieldCurve()["1 YR"], 4);
             percentageComplete += eachPart;
-            ReportStatus(action, string.Format("{0}% Finished Downloading yield curve..", percentageComplete), StatusType.Success);
+            ReportStatus(action, string.Format("{0}% Finished downloading yield curve..", percentageComplete), StatusType.Success);
 
             List<string> errors;
             var stock = DataService.GetStockQuote(new List<string> { symbol }, out errors).First();
