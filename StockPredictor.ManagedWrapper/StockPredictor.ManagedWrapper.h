@@ -18,11 +18,7 @@ namespace StockPredictorManagedWrapper {
 			!NativeClassWrapper();
 		
 		System::Collections::Generic::List<double>^ SimulateStockPrice(int days, long iterations, double price, double rate, double dividendYield, double volatility);
-
 		System::Collections::Generic::List<double>^ SimulateStockPrice(int days, long iterations, double price, double volatility);
-		/*{
-			return m_nativeClass->SimulateStockPrice(days, iterations, price, volatility);
-		}*/
 		double GetWeightedStandardDeviation(System::Collections::Generic::List<double>^ distribution);
 	private :
 		MonteCarloSimulator* m_nativeClass;

@@ -115,7 +115,8 @@ namespace StockPredictor.Cs.Tests
         public void GetStockProjections_Simulates_Stock_Prices(string symbol, int days)
         {
             var manager = new StockManager {DataService = new DataService()};
-            var stockPrices = manager.GetStockProjections(symbol, days, null);
+            int direction;
+            var stockPrices = manager.GetStockProjections(symbol, days, null, out direction);
             Assert.IsTrue(stockPrices.Any());
         }
 

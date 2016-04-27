@@ -12,8 +12,6 @@ namespace StockPredictor.Console
         private static readonly StockManager StockManager = new StockManager();
         static void Main(string[] args)
         {
-            
-            //System.Console.ForegroundColor = ConsoleColor.White;
             System.Console.WriteLine("Warming up....");
             StockManager.DataService = new DataService();
             var arguments = new Arguments();
@@ -38,6 +36,7 @@ namespace StockPredictor.Console
             System.Console.ForegroundColor = ConsoleColor.Green;
             try
             {
+                int direction;
                 var points = StockManager.GetStockProjections(arguments.Symbol, arguments.Days, (s, st) =>
                 {
                     switch (st)
@@ -49,18 +48,35 @@ namespace StockPredictor.Console
                             System.Console.ForegroundColor = ConsoleColor.Green;
                             break;
                         case StatusType.Warn:
-                            System.Console.ForegroundColor = ConsoleColor.DarkCyan;
-                            break;
+                            System.Console.ForegroundColor = ConsoleColor.Yellow;
+                            break;      
                         case StatusType.Fail:
                             System.Console.ForegroundColor = ConsoleColor.Red;
                             break;
                     }
                     System.Console.WriteLine(s);
-                });
+                }, out direction);
                 if (points != null && points.Any())
                 {
-                    System.Console.ForegroundColor = ConsoleColor.White;
-                    System.Console.WriteLine("Projected({0}) days = {1}", arguments.Days, Math.Round(points.Last(), 2));
+                    System.Console.ForegroundColor = ConsoleColor.Gray;
+                    System.Console.Write("Projected @{0} days = ", arguments.Days);
+                    switch (direction)
+                    {
+                        case -99:
+                            System.Console.ForegroundColor = ConsoleColor.Red;
+                            break;
+                        case -1:
+                            System.Console.ForegroundColor = ConsoleColor.Red;
+                            break;
+                        case 0:
+                            System.Console.ForegroundColor = ConsoleColor.White;
+                            break;
+                        case 1:
+                            System.Console.ForegroundColor = ConsoleColor.Green;
+                            break;
+
+                    }
+                    System.Console.Write(Math.Round(points.Last(), 2));
                 }
                 //Plotter.DoThePlot((x) => x > points.Length - 1 ? 0 : points[(int) x]);
             }

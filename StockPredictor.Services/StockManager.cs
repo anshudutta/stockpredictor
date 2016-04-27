@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Windows.Forms;
 using StockPredictorManagedWrapper;
 
 namespace StockPredictor.Services
@@ -16,14 +17,11 @@ namespace StockPredictor.Services
             
         }
 
-        public double[] GetStockProjections(string symbol, int days, Action<string, StatusType> action)
+        public double[] GetStockProjections(string symbol, int days, Action<string, StatusType> action, out int direction)
         {
+            direction = -99;
             var percentageComplete = 0;
             const int eachPart = 20;
-
-            double rate1Year = Math.Round(DataService.GetYieldCurve()["1 YR"], 4);
-            percentageComplete += eachPart;
-            ReportStatus(action, string.Format("{0}% Finished downloading yield curve..", percentageComplete), StatusType.Success);
 
             List<string> errors;
             var stock = DataService.GetStockQuote(new List<string> { symbol }, out errors).First();
@@ -55,17 +53,19 @@ namespace StockPredictor.Services
             percentageComplete += eachPart;
             ReportStatus(action, string.Format("{0}% Finished downloading stock quote..", percentageComplete), StatusType.Success);
 
+            double rate1Year = Math.Round(DataService.GetYieldCurve()["1 YR"], 4);
+            percentageComplete += eachPart;
+            ReportStatus(action, string.Format("{0}% Finished downloading yield curve..", percentageComplete), StatusType.Success);
+
             double? volatility = DataService.GetImpliedVolatility(symbol);
             percentageComplete += eachPart;
             if (volatility == null)
             {
-                var sb = new StringBuilder();
-                sb.AppendLine("Unable to calculate Implied Volatility. Using Historical Volatility...");
-                ReportStatus(action, sb.ToString(), StatusType.Warn);
+                ReportStatus(action, "Unable to calculate Implied Volatility. Using Historical Volatility...", StatusType.Warn);
                 using (var quantLib = new NativeClassWrapper())
                 {
                     var dailyReturns = DataService.GetHistoricalQuote(symbol).Select(p => p.DailyReturn).ToList();
-                    volatility = quantLib.GetWeightedStandardDeviation(dailyReturns);
+                    volatility = quantLib.GetWeightedStandardDeviation(dailyReturns) * Math.Pow(252, .5);
                 }
             }
             
@@ -103,6 +103,7 @@ namespace StockPredictor.Services
                 ReportStatus(action,string.Format("100% Completed"), StatusType.Success);
                 var sb = new StringBuilder();
                 sb.AppendLine(string.Format("Symbol : {0}", symbol));
+                sb.AppendLine(string.Format("Description : {0}", stock.Name));
                 sb.AppendLine(string.Format("Bid price : {0}", stock.Bid));
                 sb.AppendLine(string.Format("Ask price : {0}", stock.Ask));
                 sb.AppendLine(string.Format("Exchange : {0}", stock.StockExchange));
@@ -110,6 +111,9 @@ namespace StockPredictor.Services
                 sb.AppendLine(string.Format("Rsk free Rate %: {0}", Math.Round(rate1Year * 100, 2)));
                 sb.AppendLine(string.Format("Dividend %: {0}", dividendYield == 0 ? "Not Available" : Math.Round(dividendYield * 100, 2).ToString()));
                 ReportStatus(action,sb.ToString(),StatusType.Info);
+
+                var mid = (double)Math.Round((stock.Bid.Value + stock.Ask.Value)/2, 2);
+                direction = result.Last() > mid ? 1 : result.Last() < mid ? -1 : 0;
                 return result;
             }
         }
