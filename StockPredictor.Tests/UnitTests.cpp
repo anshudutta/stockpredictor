@@ -58,15 +58,29 @@ namespace StockPredictorTests
 		{
 			MonteCarloSimulator simulator;
 			int days = 20;
-			long iterations = 1000000;
+			long iterations = 5000;
 			double price = 10;
 			double drift = 0.01;
 			double stdDev = 0.25;
 			double rate = 0.65;
 			double divYield = 0.02;
 
-			std::vector<double> result = simulator.SimulateStockPrice(days, iterations, price, rate, divYield, stdDev);
-			double proceAtEndOfProjection = result[days-1];
+			std::vector<double> result;
+			double proceAtEndOfProjection;
+
+
+
+			result = simulator.SimulateStockPrice(days, iterations, price, rate, divYield, stdDev);
+			proceAtEndOfProjection = result[days-1];
+			Assert::AreNotEqual(0.0, proceAtEndOfProjection);
+
+			days = 1;
+			iterations = 500000;
+			price = 252.34;
+			stdDev = 1.0404;
+
+			result = simulator.SimulateStockPrice(days, iterations, price, stdDev);
+			proceAtEndOfProjection = result[days-1];
 			Assert::AreNotEqual(0.0, proceAtEndOfProjection);
 		}
 

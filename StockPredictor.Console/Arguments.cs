@@ -8,6 +8,10 @@ namespace StockPredictor.Console
 {
     class Arguments
     {
+        public Arguments()
+        {
+            Days = 1;
+        }
         public string Symbol { get; set; }
         public int Days { get; set; }
     }

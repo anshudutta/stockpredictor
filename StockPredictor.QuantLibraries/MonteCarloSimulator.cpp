@@ -41,9 +41,9 @@ bool MonteCarloSimulator::Validate(int days, long iterations, double currentPric
 		valid = false;
 	}
 
-	if (volatility <= 0 || volatility > 1)
+	if (volatility <= 0)
 	{
-		message += "Validation Error : Input parameter drift must be greater than 0 and less than one";
+		message += "Validation Error : Input parameter volatility must be greater than 0 and less than one";
 		valid = false;
 	}
 
@@ -52,7 +52,9 @@ bool MonteCarloSimulator::Validate(int days, long iterations, double currentPric
 
 vector<double> MonteCarloSimulator::SimulateStockPrice(int days, long iterations, double currentPrice, double volatility)
 {
-	return SimulateStockPrice(days, iterations, currentPrice, 0, 0, volatility);
+	double rate = 0.0;
+	double dividend = 0.0;
+	return SimulateStockPrice(days, iterations, currentPrice, rate, dividend, volatility);
 }
 
 vector<double> MonteCarloSimulator::SimulateStockPrice(int days, long iterations, double currentPrice, double rate, double dividendYield, double volatility)

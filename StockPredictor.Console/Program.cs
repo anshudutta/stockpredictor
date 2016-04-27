@@ -97,10 +97,6 @@ namespace StockPredictor.Console
                     sb.AppendLine("Invalid argument. No of projection days must be non zero int");
                     valid = false;
                 }
-                else
-                {
-                    arguments.Days = days;
-                }
             }
             message = sb.ToString();
             return valid;
