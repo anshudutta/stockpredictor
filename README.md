@@ -18,3 +18,5 @@ where,
 The service crwals various public website to get relevant information for a security, e.g. spot price, implied volatility, risk free rate, dividend yield etc. It then feeds the values to the above model and runs Monte Carlo simulation for n paths each of which is defined by a random Z value. The outcome is the price of the stock after x days as derived from the simulation.
 
 Note that this is a mathematical simulation process and not the same as technical analysis of a stock. This is simple giving us the mean value of a stock after x days when the above model is simulated over N number of paths.
+
+The simulator function is written in C++ and the service is in .NET, C#
