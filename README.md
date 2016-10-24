@@ -1,4 +1,4 @@
-"# stockpredictor" 
+# stockpredictor
 
 Predicts the Movement of stock prices through Monte Carlo Simulation
 
